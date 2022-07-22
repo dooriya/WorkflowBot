@@ -1,5 +1,5 @@
 import { HelloWorldCommandHandler } from "../helloworldCommandHandler";
-import { ConversationBot } from "@microsoft/teamsfx";
+import { ConversationBot } from "../sdk/conversation";
 
 // Create the command bot and register the command handlers for your app.
 // You can also use the commandBot.command.registerCommands to register other commands

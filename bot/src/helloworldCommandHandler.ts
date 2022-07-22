@@ -3,8 +3,8 @@ import {
   CommandMessage,
   TeamsFxBotCommandHandler,
   TriggerPatterns,
-  MessageBuilder,
-} from "@microsoft/teamsfx";
+} from "./sdk/interface"
+import { MessageBuilder } from "./sdk/messageBuilder";
 import helloWorldCard from "./adaptiveCards/helloworldCommand.json";
 import { CardData } from "./cardModels";
 
