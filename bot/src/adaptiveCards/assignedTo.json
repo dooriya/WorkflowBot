@@ -1,0 +1,104 @@
+{
+    "type": "AdaptiveCard",
+    "body": [
+      {
+        "type": "Container",
+        "style": "emphasis",
+        "items": [
+          {
+            "type": "ColumnSet",
+            "columns": [
+              {
+                "type": "Column",
+                "items": [
+                  {
+                    "type": "TextBlock",
+                    "size": "Large",
+                    "weight": "Bolder",
+                    "text": "**${incidentTitle}**"
+                  }
+                ],
+                "width": "stretch"
+              },
+              {
+                "type": "Column",
+                "items": [
+                  {
+                    "type": "TextBlock",
+                    "size": "Medium",
+                    "weight": "Bolder",
+                    "text": "Pending"
+                  }
+                ],
+                "width": "auto"
+              }
+            ]
+          }
+        ],
+        "bleed": true
+      },
+      {
+        "type": "Container",
+        "items": [
+          {
+            "type": "ColumnSet",
+            "columns": [
+              {
+                "type": "Column",
+                "width": "stretch",
+                "items": [
+                  {
+                    "type": "FactSet",
+                    "facts": [
+                      {
+                        "title": "**Created By:**",
+                        "value": "${createdByName}"
+                      },
+                      {
+                        "title": "**Assigned To:**",
+                        "value": "${assignedToName}"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "ActionSet",
+        "actions": [
+          {
+            "type": "Action.Execute",
+            "verb": "approved",
+            "title": "Approve",
+            "data": {
+                "IncidentId": "${incidentId}",
+                "IncidentTitle": "${incidentTitle}",
+                "createdByName": "${createdByName}",
+                "createdByUserId": "${createdByUserId}",
+                "assignedToName": "${assignedToName}",
+                "assignedToUserId": "${assignedToUserId}"
+            }
+          },
+          {
+            "type": "Action.Execute",
+            "verb": "rejected",
+            "title": "Reject",
+            "data": {
+                "IncidentId": "${incidentId}",
+                "IncidentTitle": "${incidentTitle}",
+                "createdByName": "${createdByName}",
+                "createdByUserId": "${createdByUserId}",
+                "assignedToName": "${assignedToName}",
+                "assignedToUserId": "${assignedToUserId}"
+            }
+          }
+        ]
+      }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.4"
+  }
+  

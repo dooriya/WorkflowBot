@@ -1,0 +1,91 @@
+{
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "type": "AdaptiveCard",
+    "version": "1.4",
+    "refresh": {
+      "action": {
+        "type": "Action.Execute",
+        "title": "Submit",
+        "verb": "reviewRefresh",
+        "data": {
+          "incidentId": "${incidentId}",
+          "incidentTitle": "${incidentTitle}",
+          "createdByName": "${createdByName}",
+          "createdByUserId": "${createdByUserId}",
+          "assignedToName": "${assignedToName}",
+          "assignedToUserId": "${assignedToUserId}"
+        }
+      },
+      "userIds": [
+        "${assignedToUserId}"
+      ]
+    },
+    "body": [
+      {
+        "type": "Container",
+        "style": "emphasis",
+        "items": [
+          {
+            "type": "ColumnSet",
+            "columns": [
+              {
+                "type": "Column",
+                "items": [
+                  {
+                    "type": "TextBlock",
+                    "size": "Large",
+                    "weight": "Bolder",
+                    "text": "**${incidentTitle}**"
+                  }
+                ],
+                "width": "stretch"
+              },
+              {
+                "type": "Column",
+                "items": [
+                  {
+                    "type": "TextBlock",
+                    "size": "Medium",
+                    "weight": "Bolder",
+                    "text": "Pending"
+                  }
+                ],
+                "width": "auto"
+              }
+            ]
+          }
+        ],
+        "bleed": true
+      },
+      {
+        "type": "Container",
+        "items": [
+          {
+            "type": "ColumnSet",
+            "columns": [
+              {
+                "type": "Column",
+                "width": "stretch",
+                "items": [
+                  {
+                    "type": "FactSet",
+                    "facts": [
+                      {
+                        "title": "**Created By:**",
+                        "value": "${createdByName}"
+                      },
+                      {
+                        "title": "**Assigned To:**",
+                        "value": "${assignedToName}"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  

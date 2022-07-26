@@ -1,4 +1,4 @@
-import { HelloWorldCommandHandler } from "../helloworldCommandHandler";
+import { CreateIncidentCommandHandler } from "../createIncidentCommandHandler";
 import { ConversationBot } from "../sdk/conversation";
 
 // Create the command bot and register the command handlers for your app.
@@ -13,6 +13,6 @@ export const commandBot = new ConversationBot({
   },
   command: {
     enabled: true,
-    commands: [new HelloWorldCommandHandler()],
+    commands: [new CreateIncidentCommandHandler()],
   },
 });
