@@ -1,4 +1,3 @@
-import { CreateIncidentCommandHandler } from "../createIncidentCommandHandler";
 import { ConversationBot } from "../sdk/conversation";
 
 // Create the command bot and register the command handlers for your app.
@@ -12,7 +11,6 @@ export const commandBot = new ConversationBot({
     appPassword: process.env.BOT_PASSWORD,
   },
   command: {
-    enabled: true,
-    commands: [new CreateIncidentCommandHandler()],
+    enabled: true
   },
 });

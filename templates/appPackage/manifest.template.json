@@ -30,27 +30,35 @@
                 "personal",
                 "team",
                 "groupchat"
-            ],
-            "supportsFiles": false,
-            "isNotificationOnly": false,
-            "commandLists": [
+            ]
+        }
+    ],
+    "composeExtensions": [
+        {
+            "botId": "{{state.fx-resource-bot.botId}}",
+            "commands": [
                 {
-                    "scopes": [
-                        "personal",
-                        "team",
-                        "groupchat"
+                    "id": "initWorkflow",
+                    "type": "action",
+                    "title": "Init workflow",
+                    "description": "Example of initialing workflow with task module",
+                    "initialRun": false,
+                    "fetchTask": true,
+                    "context": [
+                      "commandBox",
+                      "compose",
+                      "message"
                     ],
-                    "commands": [
+                    "parameters": [
                         {
-                            "title": "createIncident",
-                            "description": "Create incident for Microsoft Teams"
+                          "name": "name",
+                          "title": "title"
                         }
-                    ]
+                      ]
                 }
             ]
         }
     ],
-    "composeExtensions": [],
     "configurableTabs": [],
     "staticTabs": [],
     "permissions": [

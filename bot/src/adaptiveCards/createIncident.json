@@ -20,7 +20,8 @@
       {
         "type": "Input.Text",
         "id": "incidentTitle",
-        "placeholder": "Enter Title"
+        "placeholder": "Enter Title",
+        "value": "${incidentTitle}"
       },
       {
         "type": "RichTextBlock",
@@ -35,15 +36,15 @@
         "type": "Input.ChoiceSet",
         "choices": "${assignees}",
         "id": "assignedToUserId",
-        "isMultiSelect": false
+        "isMultiSelect": false,
+        "value": "${assignedToUserId}"
       },
       {
         "type": "ActionSet",
         "actions": [
           {
-            "type": "Action.Execute",
-            "verb": "createIncident",
-            "title": "Submit",
+            "type": "Action.Submit",
+            "title": "Create",
             "data": {
               "createdByName": "${createdByName}",
               "createdByUserId": "${createdByUserId}",

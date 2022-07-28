@@ -12,6 +12,7 @@ export interface AssignToMember {
 
 // Dynamic data for createIncident card
 export interface CreateIncidentData {
+  incidentTitle?: string;
   createdByName: string;
   createdByUserId: string;
   assignees: AssignToMember[];
