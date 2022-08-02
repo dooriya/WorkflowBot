@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import { BotFrameworkAdapter, TurnContext, WebRequest, WebResponse } from "botbuilder";
+import { ActionHandlerBot } from "./actionHandler";
 import { CommandBot } from "./command";
 import { ConversationOptions } from "./interface";
 import { NotificationBot } from "./notification";
@@ -74,6 +75,11 @@ export class ConversationBot {
   public readonly notification?: NotificationBot;
 
   /**
+   * The action handler used for adaptive card universal actions.
+   */
+  public readonly cardAction?: ActionHandlerBot;
+
+  /**
    * Creates new instance of the `ConversationBot`.
    *
    * @remarks
@@ -94,6 +100,10 @@ export class ConversationBot {
 
     if (options.notification?.enabled) {
       this.notification = new NotificationBot(this.adapter, options.notification);
+    }
+
+    if (options.cardAction?.enabled) {
+      this.cardAction = new ActionHandlerBot(this.adapter, options.cardAction);
     }
   }
 

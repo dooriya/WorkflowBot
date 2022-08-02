@@ -1,10 +1,10 @@
-import { CreateIncidentCommandHandler } from "../createIncidentCommandHandler";
+import { incidentReportingCommand } from "../incidentReportingWorkflow";
 import { ConversationBot } from "../sdk/conversation";
 
 // Create the command bot and register the command handlers for your app.
 // You can also use the commandBot.command.registerCommands to register other commands
 // if you don't want to register all of them in the constructor
-export const commandBot = new ConversationBot({
+export const teamsBot = new ConversationBot({
   // The bot id and password to create BotFrameworkAdapter.
   // See https://aka.ms/about-bot-adapter to learn more about adapters.
   adapterConfig: {
@@ -13,6 +13,17 @@ export const commandBot = new ConversationBot({
   },
   command: {
     enabled: true,
-    commands: [new CreateIncidentCommandHandler()],
+    commands: [ incidentReportingCommand ],
   },
+  cardAction: {
+    enabled: true,
+    handlers: incidentReportingCommand.actionHandlerRegistry.registry
+  }
 });
+
+// You can also register handler(s) after initialization, for example:
+// teamsBot.command.registerCommand(incidentReportingWorkflow);
+// teamsBot.cardAction
+//   .registerHandler("createIncident", incidentReportingWorkflow.processCreateIncident)
+//   .registerHandler("<verb>", incidentReportingWorkflow.processApproved);
+  
