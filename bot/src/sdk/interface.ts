@@ -186,4 +186,14 @@ export interface ConversationOptions {
      */
     enabled?: boolean;
   };
+
+  /**
+   * The adaptive card actions handler part.
+   */
+   cardAction?: ActionHandlerOptions & {
+    /**
+     * Whether to enable notification or not.
+     */
+    enabled?: boolean;
+  };
 }
