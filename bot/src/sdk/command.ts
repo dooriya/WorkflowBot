@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { BotFrameworkAdapter } from "botbuilder";
-import { CommandOptions, TeamsFxBotCommandHandler } from "./interface";
+import { CommandOptions, TeamsFxBotActionHandler, TeamsFxBotCommandHandler } from "./interface";
 import { CommandResponseMiddleware } from "./middleware";
 
 /**
@@ -37,6 +37,12 @@ export class CommandBot {
     }
   }
 
+  public registerAction(action: TeamsFxBotActionHandler): void {
+    if (action) {
+      this.middleware.actionHandlers.push(action);
+    }
+  }
+
   /**
    * Registers commands into the command bot.
    *
@@ -45,6 +51,12 @@ export class CommandBot {
   public registerCommands(commands: TeamsFxBotCommandHandler[]): void {
     if (commands) {
       this.middleware.commandHandlers.push(...commands);
+    }
+  }
+
+  public registerActions(actions: TeamsFxBotActionHandler[]): void {
+    if (actions) {
+      this.middleware.actionHandlers.push(...actions);
     }
   }
 }

@@ -3,9 +3,9 @@ import {
   CommandMessage,
   TeamsFxBotCommandHandler,
   TriggerPatterns,
-} from "./sdk/interface"
+} from "../sdk/interface"
 import { AdaptiveCards } from "@microsoft/adaptivecards-tools";
-import initialCreateCard from "./adaptiveCards/initialCreate.json";
+import initialCreateCard from "../adaptiveCards/initialCreate.json";
 
 /**
  * The `HelloWorldCommandHandler` registers a pattern with the `TeamsFxBotCommandHandler` and responds

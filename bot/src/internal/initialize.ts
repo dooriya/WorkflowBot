@@ -1,4 +1,9 @@
-import { CreateIncidentCommandHandler } from "../createIncidentCommandHandler";
+import { ApproveIncidentSubmitAction } from "../actions/approveIncidentSubmit";
+import { CreateIncidentSubmitAction } from "../actions/createIncidentSubmit";
+import { InitialCreateRefreshAction } from "../actions/initialCreateRefresh";
+import { RejectIncidentSubmitAction } from "../actions/rejectIncidentSubmit";
+import { ReviewIncidentRefreshAction } from "../actions/reviewIncidentRefresh";
+import { CreateIncidentCommandHandler } from "../commands/createIncidentCommandHandler";
 import { ConversationBot } from "../sdk/conversation";
 
 // Create the command bot and register the command handlers for your app.
@@ -15,4 +20,14 @@ export const commandBot = new ConversationBot({
     enabled: true,
     commands: [new CreateIncidentCommandHandler()],
   },
+  action: {
+    enabled: true,
+    actions: [
+      new InitialCreateRefreshAction(),
+      new CreateIncidentSubmitAction(),
+      new ReviewIncidentRefreshAction(),
+      new ApproveIncidentSubmitAction(),
+      new RejectIncidentSubmitAction()
+    ],
+  }
 });

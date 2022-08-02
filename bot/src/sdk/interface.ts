@@ -3,6 +3,7 @@
 
 import { BotFrameworkAdapter } from "botbuilder";
 import { Activity, TurnContext } from "botbuilder-core";
+import { IAdaptiveCard } from "adaptivecards";
 
 /**
  * The target type where the notification will be sent to.
@@ -135,6 +136,15 @@ export interface TeamsFxBotCommandHandler {
   ): Promise<string | Partial<Activity> | void>;
 }
 
+export type TeamsFxWorkflowActionType = "refresh" | "submit";
+
+export interface TeamsFxBotActionHandler {
+  verb: string;
+  type: TeamsFxWorkflowActionType;
+
+  handleActionReceived(cardData: any, context: TurnContext): Promise<IAdaptiveCard>;
+}
+
 /**
  * Options to initialize {@link CommandBot}.
  */
@@ -143,6 +153,10 @@ export interface CommandOptions {
    * The commands to registered with the command bot. Each command should implement the interface {@link TeamsFxBotCommandHandler} so that it can be correctly handled by this command bot.
    */
   commands?: TeamsFxBotCommandHandler[];
+}
+
+export interface ActionOptions {
+  actions?: TeamsFxBotActionHandler[];
 }
 
 /**
@@ -174,6 +188,10 @@ export interface ConversationOptions {
     /**
      * Whether to enable command or not.
      */
+    enabled?: boolean;
+  };
+
+  action?: ActionOptions & {
     enabled?: boolean;
   };
 

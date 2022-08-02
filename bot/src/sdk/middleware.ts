@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { Activity, ActivityTypes, Middleware, TurnContext } from "botbuilder";
-import { CommandMessage, TeamsFxBotCommandHandler, TriggerPatterns } from "./interface";
+import { Activity, ActivityTypes, CardFactory, InvokeResponse, MessageFactory, Middleware, StatusCodes, TurnContext } from "botbuilder";
+import { CommandMessage, TeamsFxBotActionHandler, TeamsFxBotCommandHandler, TriggerPatterns } from "./interface";
 import { ConversationReferenceStore } from "./storage";
 import { cloneConversation } from "./utils";
 
@@ -106,6 +106,7 @@ export class NotificationMiddleware implements Middleware {
 
 export class CommandResponseMiddleware implements Middleware {
   public readonly commandHandlers: TeamsFxBotCommandHandler[] = [];
+  public readonly actionHandlers: TeamsFxBotActionHandler[] = [];
 
   constructor(handlers?: TeamsFxBotCommandHandler[]) {
     if (handlers && handlers.length > 0) {
@@ -113,7 +114,7 @@ export class CommandResponseMiddleware implements Middleware {
     }
   }
 
-  public async onTurn(context: TurnContext, next: () => Promise<void>): Promise<void> {
+  public async onTurn(context: TurnContext, next: () => Promise<void>): Promise<any> {
     if (context.activity.type === ActivityTypes.Message) {
       // Invoke corresponding command handler for the command response
       const commandText = this.getActivityText(context.activity);
@@ -141,9 +142,43 @@ export class CommandResponseMiddleware implements Middleware {
           }
         }
       }
+    } else if (context.activity.type === ActivityTypes.Invoke) {
+      const actionData = context.activity.value.action.data;
+      const actionVerb = context.activity.value.action.verb;
+      for (const action of this.actionHandlers) {
+        if (actionVerb === action.verb) {
+          const card = await action.handleActionReceived(actionData, context);
+
+          if (action.type === "submit") {
+            const activity = MessageFactory.attachment(CardFactory.adaptiveCard(card));
+            activity.id = context.activity.replyToId;;
+            await context.updateActivity(activity);
+          } else {
+            // TODO: doesn't work for refresh action.
+            return this.createInvokeResponse(card);
+          }
+        }
+      }
+
+      return this.createInvokeResponse(undefined);
     }
 
     await next();
+  }
+
+  private createInvokeResponse(card: any): InvokeResponse<any> {
+    const cardRes = {
+      statusCode: StatusCodes.OK,
+      type: 'application/vnd.microsoft.card.adaptive',
+      value: card
+    };
+
+    const res = {
+      status: StatusCodes.OK,
+      body: cardRes
+    };
+
+    return res;
   }
 
   private matchPattern(pattern: string | RegExp, text: string): boolean | RegExpMatchArray {

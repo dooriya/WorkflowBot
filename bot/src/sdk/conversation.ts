@@ -92,6 +92,14 @@ export class ConversationBot {
       this.command = new CommandBot(this.adapter, options.command);
     }
 
+    if (options.action?.enabled) {
+      if (this.command) {
+        this.command.registerActions(options.action.actions);
+      } else {
+        // this.command = new CommandBot(this.adapter, options.action);
+      }
+    }
+
     if (options.notification?.enabled) {
       this.notification = new NotificationBot(this.adapter, options.notification);
     }
