@@ -5,7 +5,7 @@ import {
   TriggerPatterns,
 } from "../sdk/interface"
 import { AdaptiveCards } from "@microsoft/adaptivecards-tools";
-import initialCreateCard from "../adaptiveCards/initialCreate.json";
+import IncidentCard from "../adaptiveCards/incidentRequest.json";
 
 /**
  * The `HelloWorldCommandHandler` registers a pattern with the `TeamsFxBotCommandHandler` and responds
@@ -21,11 +21,11 @@ export class CreateIncidentCommandHandler implements TeamsFxBotCommandHandler {
     console.log(`Bot received message: ${message.text}`);
 
     var createdByUser = await TeamsInfo.getMember(context, context.activity.from.id);
-    const initialCardJson = AdaptiveCards.declare(initialCreateCard).render({
-      createdByName: createdByUser.name,
-      createdByUserId: createdByUser.id
+    const IncidentCardJson = AdaptiveCards.declare(IncidentCard).render({
+      incidentTitle: "Incident 101",
+      createdByName: createdByUser.name
     });
 
-    return MessageFactory.attachment(CardFactory.adaptiveCard(initialCardJson));
+    return MessageFactory.attachment(CardFactory.adaptiveCard(IncidentCardJson));
   }
 }

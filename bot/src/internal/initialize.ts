@@ -1,8 +1,4 @@
-import { ApproveIncidentSubmitAction } from "../actions/approveIncidentSubmit";
-import { CreateIncidentSubmitAction } from "../actions/createIncidentSubmit";
-import { InitialCreateRefreshAction } from "../actions/initialCreateRefresh";
-import { RejectIncidentSubmitAction } from "../actions/rejectIncidentSubmit";
-import { ReviewIncidentRefreshAction } from "../actions/reviewIncidentRefresh";
+import { ApproveIncidentActionHandler } from "../actions/approveIncidentActionHandler";
 import { CreateIncidentCommandHandler } from "../commands/createIncidentCommandHandler";
 import { ConversationBot } from "../sdk/conversation";
 
@@ -22,12 +18,6 @@ export const commandBot = new ConversationBot({
   },
   action: {
     enabled: true,
-    actions: [
-      new InitialCreateRefreshAction(),
-      new CreateIncidentSubmitAction(),
-      new ReviewIncidentRefreshAction(),
-      new ApproveIncidentSubmitAction(),
-      new RejectIncidentSubmitAction()
-    ],
+    actions: [new ApproveIncidentActionHandler()],
   }
 });

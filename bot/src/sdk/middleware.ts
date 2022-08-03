@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { Activity, ActivityTypes, CardFactory, InvokeResponse, MessageFactory, Middleware, StatusCodes, TurnContext } from "botbuilder";
+import { Activity, ActivityTypes, CardFactory, InvokeResponse, INVOKE_RESPONSE_KEY, MessageFactory, Middleware, StatusCodes, TurnContext } from "botbuilder";
 import { CommandMessage, TeamsFxBotActionHandler, TeamsFxBotCommandHandler, TriggerPatterns } from "./interface";
 import { ConversationReferenceStore } from "./storage";
 import { cloneConversation } from "./utils";
@@ -145,22 +145,25 @@ export class CommandResponseMiddleware implements Middleware {
     } else if (context.activity.type === ActivityTypes.Invoke) {
       const actionData = context.activity.value.action.data;
       const actionVerb = context.activity.value.action.verb;
+
       for (const action of this.actionHandlers) {
         if (actionVerb === action.verb) {
           const card = await action.handleActionReceived(actionData, context);
+          const response: InvokeResponse = this.createInvokeResponse(card);
 
           if (action.type === "submit") {
             const activity = MessageFactory.attachment(CardFactory.adaptiveCard(card));
-            activity.id = context.activity.replyToId;;
+            activity.id = context.activity.replyToId;
             await context.updateActivity(activity);
-          } else {
-            // TODO: doesn't work for refresh action.
-            return this.createInvokeResponse(card);
           }
+
+          // return invoke response
+          await context.sendActivity({
+            type: ActivityTypes.InvokeResponse,
+            value: response,
+          });
         }
       }
-
-      return this.createInvokeResponse(undefined);
     }
 
     await next();
