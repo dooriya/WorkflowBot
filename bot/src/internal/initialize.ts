@@ -11,6 +11,9 @@ export const teamsBot = new ConversationBot({
     appId: process.env.BOT_ID,
     appPassword: process.env.BOT_PASSWORD,
   },
+  notification: {
+    enabled: true,
+  },
   command: {
     enabled: true,
     commands: [ incidentReportingCommand ],

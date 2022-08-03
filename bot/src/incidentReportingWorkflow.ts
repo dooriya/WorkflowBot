@@ -5,7 +5,6 @@ import {
   TriggerPatterns,
 } from "./sdk/interface"
 import { AdaptiveCards } from "@microsoft/adaptivecards-tools";
-import initialCreateCard from "./adaptiveCards/initialCreate.json";
 import createIncidentCard from "./adaptiveCards/createIncident.json";
 import reviewIncidentCard from "./adaptiveCards/reviewIncident.json";
 import assignedToCard from "./adaptiveCards/assignedTo.json";
@@ -13,20 +12,22 @@ import approvedCard from "./adaptiveCards/approvedIncident.json";
 import rejectedCard from "./adaptiveCards/rejectedIncident.json";
 import { AssignToMember, CreateIncidentData, IncidentDetails } from "./cardModels";
 import { ActionHandlerRegistry } from "./sdk/actionHandlerRegistry";
+import { teamsBot } from "./internal/initialize";
+import { Member } from "./sdk/notification";
 
 /**
  * The `IncidentReportingWorkflow` registers a pattern with the `TeamsFxBotCommandHandler` and responds
  * with an Adaptive Card if the user types the `triggerPatterns`.
  */
-
 export class IncidentReportingWorkflow implements TeamsFxBotCommandHandler {
   triggerPatterns: TriggerPatterns = "createIncident";
   actionHandlerRegistry: ActionHandlerRegistry = new ActionHandlerRegistry();
 
+  // hard-code team id here to fetch the members in a personal scope
+  private readonly teamId = "19:kj7hexHcaJzXJpfLJoF13fXf3h02RurYyeW3RyCMrRA1@thread.tacv2";
+
   constructor() {
     this.actionHandlerRegistry
-      .registerHandler("initialRefresh", this.processInitialRefresh.bind(this))
-      .registerHandler("reviewRefresh", this.processReviewRefresh.bind(this))
       .registerHandler("createIncident", this.processCreateIncident.bind(this))
       .registerHandler("approved", this.processApproved.bind(this))
       .registerHandler("rejected", this.processRejected.bind(this))
@@ -38,17 +39,6 @@ export class IncidentReportingWorkflow implements TeamsFxBotCommandHandler {
   ): Promise<string | Partial<Activity> | void> {
     console.log(`Bot received message: ${message.text}`);
 
-    var createdByUser = await TeamsInfo.getMember(context, context.activity.from.id);
-    const initialCardJson = AdaptiveCards.declare(initialCreateCard).render({
-      createdByName: createdByUser.name,
-      createdByUserId: createdByUser.id
-    });
-
-    return MessageFactory.attachment(CardFactory.adaptiveCard(initialCardJson));
-  }
-
-  // @WorkflowStep("initialRefresh")
-  async processInitialRefresh(context: TurnContext): Promise<any> {
     // prepare card data
     const assignees: AssignToMember[] = await this.getAssignees(context);
     var createdUser = await TeamsInfo.getMember(context, context.activity.from.id);
@@ -60,13 +50,13 @@ export class IncidentReportingWorkflow implements TeamsFxBotCommandHandler {
 
     // generate response card
     const createIncidentCardJson = AdaptiveCards.declare(createIncidentCard).render(createIncidentData);
-    return createIncidentCardJson;
+    return MessageFactory.attachment(CardFactory.adaptiveCard(createIncidentCardJson));
   }
 
   // @WorkflowStep("createIncident")
   async processCreateIncident(context: TurnContext): Promise<any> {
     const action = context.activity.value.action;
-    const assignedToUser = (await TeamsInfo.getMember(context, action.data.assignedToUserId));
+    const assignedToUser = (await TeamsInfo.getTeamMember(context, this.teamId, action.data.assignedToUserId));
     action.data.assignedToName = assignedToUser.name;
     const incidentDetails: IncidentDetails = {
       incidentId: Math.random().toString(),
@@ -76,57 +66,57 @@ export class IncidentReportingWorkflow implements TeamsFxBotCommandHandler {
       assignedToUserId: action.data.assignedToUserId,
       assignedToName: action.data.assignedToName
     };
+    
+    // send notification to assignee
+    const assignedToCardJson = AdaptiveCards.declare(assignedToCard).render(incidentDetails);
+    const assignee = await this.getNotificationMember(context, incidentDetails.assignedToUserId);
+    if (assignee !== undefined) {
+      await assignee.sendAdaptiveCard(assignedToCardJson);
+    }
+
+    // reply to initiator
     const reviewCardJson = AdaptiveCards.declare(reviewIncidentCard).render(incidentDetails);
-
-    // Update the card for assignee
-    const replyActivity = MessageFactory.attachment(CardFactory.adaptiveCard(reviewCardJson));
-    replyActivity.id = context.activity.replyToId;;
-    await context.updateActivity(replyActivity);
-
-    // Update the card for creator
     return reviewCardJson;
-  }
-
-  // @WorkflowStep("reviewRefresh")
-  async processReviewRefresh(context: TurnContext): Promise<any> {
-    const action = context.activity.value.action;
-    const assignedToCardJson = AdaptiveCards.declare(assignedToCard).render(action.data);
-    return assignedToCardJson;
   }
 
   // @WorkflowStep("approved")
   async processApproved(context: TurnContext): Promise<any> {
     const action = context.activity.value.action;
+    const incidentDetails = action.data;
     const approvedCardJson = AdaptiveCards.declare(approvedCard).render(action.data);
 
-    // Update the card for creator
-    const approvedActivity = MessageFactory.attachment(CardFactory.adaptiveCard(approvedCardJson));
-    approvedActivity.id = context.activity.replyToId;;
-    await context.updateActivity(approvedActivity);
+    // send notification to initiator
+    const initiator = await this.getNotificationMember(context, incidentDetails.createdByUserId);
+    if (initiator !== undefined) {
+      await initiator.sendAdaptiveCard(approvedCardJson);
+    }
 
-    // // Update the card for assignee (resolver)
+    // Update the card for assignee
     return approvedCardJson;
   }
 
   // @WorkflowStep("rejected")
   async processRejected(context: TurnContext): Promise<any> {
     const action = context.activity.value.action;
+    const incidentDetails = action.data;
     const rejectedCardJson = AdaptiveCards.declare(rejectedCard).render(action.data);
 
-    // Update the card for creator
-    const rejectedActivity = MessageFactory.attachment(CardFactory.adaptiveCard(rejectedCardJson));
-    rejectedActivity.id = context.activity.replyToId;;
-    await context.updateActivity(rejectedActivity);
+    // send notification to initiator
+    const initiator = await this.getNotificationMember(context, incidentDetails.createdByUserId);
+    if (initiator !== undefined) {
+      await initiator.sendAdaptiveCard(rejectedCardJson);
+    }
 
-    // // Update the card for assignee (resolver)
+    // Update the card for assignee
     return rejectedCardJson;
   }
 
-  async getAssignees(context: TurnContext): Promise<AssignToMember[]> {
-    const allMembers: TeamsChannelAccount[] = [];
+  private async getAssignees(context: TurnContext): Promise<AssignToMember[]> {
     let continuationToken: string | undefined;
-    do {
-      const pagedMembers = await TeamsInfo.getPagedMembers(context, undefined, continuationToken);
+    const allMembers: TeamsChannelAccount[] = [];
+
+    do {     
+      const pagedMembers = await TeamsInfo.getPagedTeamMembers(context, this.teamId, undefined, continuationToken);
       continuationToken = pagedMembers.continuationToken;
       allMembers.push(...pagedMembers.members);
     } while (continuationToken !== undefined);
@@ -140,6 +130,21 @@ export class IncidentReportingWorkflow implements TeamsFxBotCommandHandler {
     }
 
     return assignees;
+  }
+
+  private async getNotificationMember(context: TurnContext, userId: string): Promise<Member> {
+    for (const target of await teamsBot.notification.installations()) {
+      if (target.type === "Channel") {
+        const members = await target.members();
+        for (const member of members) {
+          if (member.account.id === userId) {
+            return member;
+          }
+        }
+      }
+    }
+
+    return undefined;
   }
 }
 
