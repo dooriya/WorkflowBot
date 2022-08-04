@@ -11,27 +11,35 @@
       "type": "TextBlock",
       "text": "${body}",
       "wrap": true
-    }
-  ],
-  "actions": [
-    {
-      "type": "Action.Execute",
-      "verb": "acknowledged",
-      "title": "Acknowledged",
-      "data": {
-        "title": "${title}",
-        "body": "${body}"
-      }
     },
     {
-      "type": "Action.OpenUrl",
-      "title": "Bot Framework Docs",
-      "url": "https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0"
-    },
-    {
-      "type": "Action.OpenUrl",
-      "title": "Teams Toolkit Docs",
-      "url": "https://aka.ms/teamsfx-docs"
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Execute",
+          "verb": "doAction1a",
+          "title": "DoAction1a",
+          "data": {
+              "key1": "value1"
+            }
+          },
+          {
+          "type": "Action.Execute",
+          "verb": "doAction1b",
+          "title": "DoAction1b",
+          "data": {
+            "key1": "value1"
+          }
+        },
+        {
+          "type": "Action.Execute",
+          "verb": "doAction1c",
+          "title": "DoAction1c",
+          "data": {
+            "key1": "value1"
+          }
+        }
+      ]
     }
   ],
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
