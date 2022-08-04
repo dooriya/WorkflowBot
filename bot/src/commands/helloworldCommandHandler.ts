@@ -1,4 +1,4 @@
-import { Activity, CardFactory, MessageFactory, TurnContext } from "botbuilder";
+import { Activity, CardFactory, MessageFactory, TeamsInfo, TurnContext } from "botbuilder";
 import {
   CommandMessage,
   TeamsFxBotCommandHandler,
@@ -20,9 +20,11 @@ export class HelloWorldCommandHandler implements TeamsFxBotCommandHandler {
   ): Promise<string | Partial<Activity> | void> {
     console.log(`Bot received message: ${message.text}`);
 
+    var createdByUser = await TeamsInfo.getMember(context, context.activity.from.id);
     const helloWorldCardJson = AdaptiveCards.declare(helloWorldCard).render({
+      createdByUserId: createdByUser.id,
       title: "Your Hello World Bot is Running",
-      body: "Congratulations! Your hello world bot is running. Click the documentation below to learn more about Bots and the Teams Toolkit.",
+      body: "Congratulations! Your hello world bot is running. Card will refreshed automatically for creator view, and keep unchanged for others view.",
     });
 
     return MessageFactory.attachment(CardFactory.adaptiveCard(helloWorldCardJson));

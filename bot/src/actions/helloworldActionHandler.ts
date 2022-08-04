@@ -9,7 +9,8 @@ import { TeamsFxBotCardActionHandler } from "../sdk/interface";
  * with an Adaptive Card if the user clicks the Adaptive Card Action with `triggerVerb`.
  */
 export class HelloWorldActionHandler implements TeamsFxBotCardActionHandler {
-    triggerVerb: string = "acknowledged";
+    triggerVerb: string = "auto-refresh";
+    refresh = true;
 
     async handleActionReceived(actionData: any, context: TurnContext): Promise<IAdaptiveCard | void> {
         return AdaptiveCards.declare(helloWorldCard).render(actionData);
