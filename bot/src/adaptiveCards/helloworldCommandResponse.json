@@ -16,16 +16,6 @@
         "type": "ActionSet",
         "actions": [
           {
-            "type": "Action.OpenUrl",
-            "title": "Bot Framework Docs",
-            "url": "https://docs.microsoft.com/en-us/azure/bot-service/?view=azure-bot-service-4.0"
-          },
-          {
-            "type": "Action.OpenUrl",
-            "title": "Teams Toolkit Docs",
-            "url": "https://aka.ms/teamsfx-docs"
-          },
-          {
             "type": "Action.Execute",
             "verb": "doAction1",
             "title": "DoAction1",
