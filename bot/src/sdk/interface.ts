@@ -136,11 +136,11 @@ export interface TeamsFxBotCommandHandler {
   ): Promise<string | Partial<Activity> | void>;
 }
 
-export interface TeamsFxBotActionHandler {
+export interface TeamsFxBotCardActionHandler {
   triggerVerb: string;
   refresh?: boolean;
 
-  handleActionReceived(cardData: any, context: TurnContext): Promise<IAdaptiveCard>;
+  handleActionReceived(cardData: any, context: TurnContext): Promise<IAdaptiveCard | void>;
 }
 
 /**
@@ -153,8 +153,11 @@ export interface CommandOptions {
   commands?: TeamsFxBotCommandHandler[];
 }
 
-export interface ActionOptions {
-  actions?: TeamsFxBotActionHandler[];
+/**
+ * Options to initialize {@link CardActionBot}.
+ */
+export interface CardActionOptions {
+  actions?: TeamsFxBotCardActionHandler[];
 }
 
 /**
@@ -189,7 +192,7 @@ export interface ConversationOptions {
     enabled?: boolean;
   };
 
-  action?: ActionOptions & {
+  cardAction?: CardActionOptions & {
     enabled?: boolean;
   };
 

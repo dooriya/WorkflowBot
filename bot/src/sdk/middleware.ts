@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { Activity, ActivityTypes, CardFactory, InvokeResponse, INVOKE_RESPONSE_KEY, MessageFactory, Middleware, StatusCodes, TurnContext } from "botbuilder";
-import { CommandMessage, TeamsFxBotActionHandler, TeamsFxBotCommandHandler, TriggerPatterns } from "./interface";
+import { CommandMessage, TeamsFxBotCardActionHandler, TeamsFxBotCommandHandler, TriggerPatterns } from "./interface";
 import { ConversationReferenceStore } from "./storage";
 import { cloneConversation } from "./utils";
 
@@ -106,7 +106,6 @@ export class NotificationMiddleware implements Middleware {
 
 export class CommandResponseMiddleware implements Middleware {
   public readonly commandHandlers: TeamsFxBotCommandHandler[] = [];
-  public readonly actionHandlers: TeamsFxBotActionHandler[] = [];
 
   constructor(handlers?: TeamsFxBotCommandHandler[]) {
     if (handlers && handlers.length > 0) {
@@ -142,46 +141,9 @@ export class CommandResponseMiddleware implements Middleware {
           }
         }
       }
-    } else if (context.activity.type === ActivityTypes.Invoke) {
-      const actionData = context.activity.value.action.data;
-      const actionVerb = context.activity.value.action.verb;
-
-      for (const action of this.actionHandlers) {
-        if (actionVerb === action.triggerVerb) {
-          const card = await action.handleActionReceived(actionData, context);
-          const response: InvokeResponse = this.createInvokeResponse(card);
-
-          if (!action.refresh) {
-            const activity = MessageFactory.attachment(CardFactory.adaptiveCard(card));
-            activity.id = context.activity.replyToId;
-            await context.updateActivity(activity);
-          }
-
-          // return invoke response
-          await context.sendActivity({
-            type: ActivityTypes.InvokeResponse,
-            value: response,
-          });
-        }
-      }
     }
 
     await next();
-  }
-
-  private createInvokeResponse(card: any): InvokeResponse<any> {
-    const cardRes = {
-      statusCode: StatusCodes.OK,
-      type: 'application/vnd.microsoft.card.adaptive',
-      value: card
-    };
-
-    const res = {
-      status: StatusCodes.OK,
-      body: cardRes
-    };
-
-    return res;
   }
 
   private matchPattern(pattern: string | RegExp, text: string): boolean | RegExpMatchArray {
@@ -222,5 +184,60 @@ export class CommandResponseMiddleware implements Middleware {
     }
 
     return text;
+  }
+}
+
+export class CardActionMiddleware implements Middleware {
+  public readonly actionHandlers: TeamsFxBotCardActionHandler[] = [];
+
+  constructor(handlers?: TeamsFxBotCardActionHandler[]) {
+    if (handlers && handlers.length > 0) {
+      this.actionHandlers.push(...handlers);
+    }
+  }
+
+  public async onTurn(context: TurnContext, next: () => Promise<void>): Promise<any> {
+    if (context.activity.type === ActivityTypes.Invoke) {
+      const actionData = context.activity.value.action.data;
+      const actionVerb = context.activity.value.action.verb;
+
+      for (const action of this.actionHandlers) {
+        if (actionVerb === action.triggerVerb) {
+          const card = await action.handleActionReceived(actionData, context);
+          if (card) {
+            const response: InvokeResponse = this.createInvokeResponse(card);
+
+            if (!action.refresh) {
+              const activity = MessageFactory.attachment(CardFactory.adaptiveCard(card));
+              activity.id = context.activity.replyToId;
+              await context.updateActivity(activity);
+            }
+
+            // return invoke response
+            await context.sendActivity({
+              type: ActivityTypes.InvokeResponse,
+              value: response,
+            });
+          }
+        }
+      }
+    }
+
+    await next();
+  }
+
+  private createInvokeResponse(card: any): InvokeResponse<any> {
+    const cardRes = {
+      statusCode: StatusCodes.OK,
+      type: 'application/vnd.microsoft.card.adaptive',
+      value: card
+    };
+
+    const res = {
+      status: StatusCodes.OK,
+      body: cardRes
+    };
+
+    return res;
   }
 }

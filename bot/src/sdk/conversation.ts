@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import { BotFrameworkAdapter, TurnContext, WebRequest, WebResponse } from "botbuilder";
+import { CardActionBot } from "./cardAction";
 import { CommandBot } from "./command";
 import { ConversationOptions } from "./interface";
 import { NotificationBot } from "./notification";
@@ -69,6 +70,11 @@ export class ConversationBot {
   public readonly command?: CommandBot;
 
   /**
+   * The entrypoint of card action.
+   */
+  public readonly cardAction?: CardActionBot;
+
+  /**
    * The entrypoint of notification.
    */
   public readonly notification?: NotificationBot;
@@ -92,12 +98,8 @@ export class ConversationBot {
       this.command = new CommandBot(this.adapter, options.command);
     }
 
-    if (options.action?.enabled) {
-      if (this.command) {
-        this.command.registerActions(options.action.actions);
-      } else {
-        // this.command = new CommandBot(this.adapter, options.action);
-      }
+    if (options.cardAction?.enabled) {
+      this.cardAction = new CardActionBot(this.adapter, options.cardAction);
     }
 
     if (options.notification?.enabled) {

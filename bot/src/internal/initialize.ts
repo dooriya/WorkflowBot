@@ -16,7 +16,7 @@ export const commandBot = new ConversationBot({
     enabled: true,
     commands: [new HelloWorldCommandHandler()],
   },
-  action: {
+  cardAction: {
     enabled: true,
     actions: [new HelloWorldActionHandler()],
   }
