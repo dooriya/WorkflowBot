@@ -147,7 +147,7 @@ export class CommandResponseMiddleware implements Middleware {
       const actionVerb = context.activity.value.action.verb;
 
       for (const action of this.actionHandlers) {
-        if (actionVerb === action.verb) {
+        if (actionVerb === action.triggerVerb) {
           const card = await action.handleActionReceived(actionData, context);
           const response: InvokeResponse = this.createInvokeResponse(card);
 

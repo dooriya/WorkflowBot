@@ -137,7 +137,7 @@ export interface TeamsFxBotCommandHandler {
 }
 
 export interface TeamsFxBotActionHandler {
-  verb: string;
+  triggerVerb: string;
   refresh?: boolean;
 
   handleActionReceived(cardData: any, context: TurnContext): Promise<IAdaptiveCard>;
