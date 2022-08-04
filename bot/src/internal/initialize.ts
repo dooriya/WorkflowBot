@@ -1,4 +1,4 @@
-import { incidentReportingCommand } from "../incidentReportingWorkflow";
+import { helloWorldCommand } from "../helloWorldCommandHandler";
 import { ConversationBot } from "../sdk/conversation";
 import { CardActionHandler } from "../sdk/actionHandler"
 
@@ -14,17 +14,21 @@ export const teamsBot = new ConversationBot({
   },
   command: {
     enabled: true,
-    commands: [ incidentReportingCommand ],
+    commands: [ helloWorldCommand ],
   },
   cardAction: {
     enabled: true,
-    handlers: incidentReportingCommand.actionHandlers
+    handlers:  helloWorldCommand.actionHandlers 
+    // or use `handlers: [ new CardActionHandler("doAction", helloWorldCommand.handleAction) ]`
+    
   }
 });
 
 // You can also register handler(s) after initialization, for example:
-// teamsBot.command.registerCommand(incidentReportingWorkflow);
+// teamsBot.command.registerCommand(helloWorldCommand);
 // teamsBot.cardAction
-//   .registerHandler("createIncident", incidentReportingCommand.processCreateIncident)
-//   .registerHandler("approved", incidentReportingCommand.processApproved);
+//   .registerHandler("doAction", helloWorldCommand.handleAction)
+//   .registerHandler("doAction2", helloWorldCommand.handleAction2)
+//   .registerHandler("doAction3", helloWorldCommand.handleAction3);
+
   

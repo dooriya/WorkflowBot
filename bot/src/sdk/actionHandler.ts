@@ -3,9 +3,9 @@ import { ActionMiddleware } from "./actionMiddleware";
 
 export class CardActionHandler {
     verb: string;
-    callback: (context: TurnContext) => Promise<any>;
+    callback: (context: TurnContext, cardData: any) => Promise<any>;
 
-    constructor(verb: string, callback: (context: TurnContext) => Promise<any>) {
+    constructor(verb: string, callback: (context: TurnContext, cardData: any) => Promise<any>) {
         this.verb = verb;
         this .callback = callback;
     }
@@ -30,7 +30,7 @@ export class ActionBot {
         this.adapter = adapter.use(this.middleware);
     }
 
-    registerHandler(id: string, callback: (context: TurnContext) => Promise<any>): this {
+    registerHandler(id: string, callback: (context: TurnContext, cardData: any) => Promise<any>): this {
         if (id) {
             this.middleware.registerHandler(id, callback);
         }

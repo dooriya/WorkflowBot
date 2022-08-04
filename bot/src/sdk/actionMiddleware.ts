@@ -17,7 +17,7 @@ export class ActionMiddleware implements Middleware  {
 
             if (this.actionHandlers.has(verb)) {
                 const handler = this.actionHandlers.get(verb);
-                const responseCard = await handler.callback(context);
+                const responseCard = await handler.callback(context, action.data);
                 const invokeResponse = this.createAdaptiveCardInvokeResponse(responseCard);
 
                 await context.sendActivity({
@@ -30,7 +30,7 @@ export class ActionMiddleware implements Middleware  {
         await next();     
     }
 
-    registerHandler(verb: string, handler: (context: TurnContext) => any) {
+    registerHandler(verb: string, handler: (context: TurnContext, cardData: any) => any) {
         const cardActionHandler: CardActionHandler = {
             verb: verb,
             callback: handler

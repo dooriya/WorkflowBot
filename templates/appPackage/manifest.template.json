@@ -42,8 +42,8 @@
                     ],
                     "commands": [
                         {
-                            "title": "createIncident",
-                            "description": "Create incident for Microsoft Teams"
+                            "title": "helloWorld",
+                            "description": "A helloworld command to send a welcome message and handle actions"
                         }
                     ]
                 }
