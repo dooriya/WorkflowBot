@@ -12,7 +12,11 @@ import { CardActionHandler } from "./sdk/actionHandler";
 import { MessageBuilder } from "./sdk/messageBuilder";
 
 /**
+<<<<<<< HEAD
  * The `HelloWorldCommand` registers a pattern with the `TeamsFxBotCommandHandler` and responds
+=======
+ * The `IncidentReportingWorkflow` registers a pattern with the `TeamsFxBotCommandHandler` and responds
+>>>>>>> 8c8f7fb (Simple helloworld sample for action handling)
  * with an Adaptive Card if the user types the `triggerPatterns`.
  */
 
@@ -38,9 +42,16 @@ export class HelloWorldCommand implements TeamsFxBotCommandHandler {
   }
 
   // @WorkflowStep("doAction")
+<<<<<<< HEAD
   async handleAction(context: TurnContext, cardData: any): Promise<any> {
     const responseCard = AdaptiveCards.declare(actionResponseCard).render(cardData);
     return responseCard;
+=======
+  async handleAction(context: TurnContext): Promise<any> {
+    const action = context.activity.value.action;
+    const assignedToCardJson = AdaptiveCards.declare(actionResponseCard).render(action.data);
+    return assignedToCardJson;
+>>>>>>> 8c8f7fb (Simple helloworld sample for action handling)
   }
 }
 
