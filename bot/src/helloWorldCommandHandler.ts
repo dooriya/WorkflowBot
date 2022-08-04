@@ -6,24 +6,22 @@ import {
 } from "./sdk/interface"
 import { AdaptiveCards } from "@microsoft/adaptivecards-tools";
 import helloWorldCommandResponseCard from "./adaptiveCards/helloworldCommandResponse.json";
-import actionResponseCard from "./adaptiveCards/actionResponse.json";
+import action1ResponseCard from "./adaptiveCards/action1Response.json";
+import action2ResponseCard from "./adaptiveCards/action2Response.json";
 import { CardData } from "./cardModels";
 import { CardActionHandler } from "./sdk/actionHandler";
 import { MessageBuilder } from "./sdk/messageBuilder";
 
 /**
-<<<<<<< HEAD
  * The `HelloWorldCommand` registers a pattern with the `TeamsFxBotCommandHandler` and responds
-=======
- * The `IncidentReportingWorkflow` registers a pattern with the `TeamsFxBotCommandHandler` and responds
->>>>>>> 8c8f7fb (Simple helloworld sample for action handling)
  * with an Adaptive Card if the user types the `triggerPatterns`.
  */
 
 export class HelloWorldCommand implements TeamsFxBotCommandHandler {
   triggerPatterns: TriggerPatterns = "helloWorld";
   actionHandlers: CardActionHandler[] = [
-    { verb: "doAction", callback: this.handleAction }
+    { verb: "doAction1", callback: this.handleAction1 },
+    { verb: "doAction2", callback: this.handleAction2 }
   ];
 
   async handleCommandReceived(
@@ -41,17 +39,16 @@ export class HelloWorldCommand implements TeamsFxBotCommandHandler {
     return MessageBuilder.attachAdaptiveCard<CardData>(helloWorldCommandResponseCard, cardData);
   }
 
-  // @WorkflowStep("doAction")
-<<<<<<< HEAD
-  async handleAction(context: TurnContext, cardData: any): Promise<any> {
-    const responseCard = AdaptiveCards.declare(actionResponseCard).render(cardData);
+  // @WorkflowStep("doAction1")
+  async handleAction1(context: TurnContext, cardData: any): Promise<any> {
+    const responseCard = AdaptiveCards.declare(action1ResponseCard).render(cardData);
     return responseCard;
-=======
-  async handleAction(context: TurnContext): Promise<any> {
-    const action = context.activity.value.action;
-    const assignedToCardJson = AdaptiveCards.declare(actionResponseCard).render(action.data);
-    return assignedToCardJson;
->>>>>>> 8c8f7fb (Simple helloworld sample for action handling)
+  }
+
+  // @WorkflowStep("doAction2")
+  async handleAction2(context: TurnContext, cardData: any): Promise<any> {
+    const responseCard = AdaptiveCards.declare(action2ResponseCard).render(cardData);
+    return responseCard;
   }
 }
 

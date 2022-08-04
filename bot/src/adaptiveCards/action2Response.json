@@ -5,7 +5,7 @@
         "type": "TextBlock",
         "size": "Medium",
         "weight": "Bolder",
-        "text": "Action is processed successfully!"
+        "text": "Action2 is processed successfully!"
       }
     ],
     "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
