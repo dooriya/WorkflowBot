@@ -5,11 +5,11 @@
         "type": "TextBlock",
         "size": "Medium",
         "weight": "Bolder",
-        "text": "${title}"
+        "text": "Action is submitted successfully!"
       },
       {
         "type": "TextBlock",
-        "text": "${body}",
+        "text": "You will be notified when the action is done or click `Get Status` button to check current status.",
         "wrap": true
       },
       {
@@ -17,8 +17,8 @@
         "actions": [
           {
             "type": "Action.Execute",
-            "verb": "submit",
-            "title": "Submit"
+            "verb": "getStatus",
+            "title": "Get Status"
           }
         ]
       }
