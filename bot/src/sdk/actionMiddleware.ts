@@ -30,12 +30,8 @@ export class ActionMiddleware implements Middleware  {
         await next();     
     }
 
-    registerHandler(verb: string, handler: (context: TurnContext, cardData: any) => any) {
-        const cardActionHandler: CardActionHandler = {
-            verb: verb,
-            callback: handler
-        }
-
+    registerHandler(cardActionHandler: CardActionHandler) {
+        const verb = cardActionHandler.verb;
         if (verb && this.actionHandlers.has(verb)) {
             this.actionHandlers.set(verb, cardActionHandler);
         }

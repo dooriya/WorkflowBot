@@ -3,6 +3,7 @@
 
 import { BotFrameworkAdapter } from "botbuilder";
 import { Activity, TurnContext } from "botbuilder-core";
+import { CardActionHandler } from "./actionHandler";
 
 /**
  * The target type where the notification will be sent to.
@@ -146,6 +147,16 @@ export interface CommandOptions {
 }
 
 /**
+ * Options to initialize {@link ActionBot}.
+ */
+export interface CardActionOptions {
+  /**
+   * The action handlers to registered with the action bot. Each command should implement the interface {@link CardActionHandler} so that it can be correctly handled by this bot.
+   */
+  handlers: CardActionHandler[];
+}
+
+/**
  * Options to initialize {@link ConversationBot}
  */
 export interface ConversationOptions {
@@ -188,9 +199,9 @@ export interface ConversationOptions {
   };
 
   /**
-   * The adaptive card actions handler part.
+   * The adaptive card action handler part.
    */
-   cardAction?: ActionHandlerOptions & {
+   cardAction?: CardActionOptions & {
     /**
      * Whether to enable notification or not.
      */

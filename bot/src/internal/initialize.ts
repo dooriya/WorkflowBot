@@ -18,9 +18,8 @@ export const teamsBot = new ConversationBot({
   },
   cardAction: {
     enabled: true,
-    handlers:  helloWorldCommand.actionHandlers 
-    // or use `handlers: [ new CardActionHandler("doAction", helloWorldCommand.handleAction) ]`
-    
+    handlers: helloWorldCommand.actionHandlers 
+   //  handlers: [ { verb: "doAction", callback: handleAction }]
   }
 });
 
@@ -30,5 +29,3 @@ export const teamsBot = new ConversationBot({
 //   .registerHandler("doAction", helloWorldCommand.handleAction)
 //   .registerHandler("doAction2", helloWorldCommand.handleAction2)
 //   .registerHandler("doAction3", helloWorldCommand.handleAction3);
-
-  

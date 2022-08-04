@@ -1,18 +1,10 @@
 import { BotFrameworkAdapter, TurnContext } from "botbuilder";
 import { ActionMiddleware } from "./actionMiddleware";
+import { CardActionOptions } from "./interface";
 
-export class CardActionHandler {
+export interface CardActionHandler {
     verb: string;
     callback: (context: TurnContext, cardData: any) => Promise<any>;
-
-    constructor(verb: string, callback: (context: TurnContext, cardData: any) => Promise<any>) {
-        this.verb = verb;
-        this .callback = callback;
-    }
-}
-
-export interface CardActionOptions {
-    handlers: CardActionHandler[];
 }
 
 export class ActionBot {
@@ -30,10 +22,9 @@ export class ActionBot {
         this.adapter = adapter.use(this.middleware);
     }
 
-    registerHandler(id: string, callback: (context: TurnContext, cardData: any) => Promise<any>): this {
-        if (id) {
-            this.middleware.registerHandler(id, callback);
+    registerHandler(actionHandler: CardActionHandler) {
+        if (actionHandler.verb) {
+            this.middleware.registerHandler(actionHandler);
         }
-        return this;
     }
 }
