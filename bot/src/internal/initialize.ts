@@ -19,7 +19,7 @@ export const teamsBot = new ConversationBot({
   cardAction: {
     enabled: true,
     handlers: helloWorldCommand.actionHandlers 
-   //  handlers: [ { verb: "doAction", callback: handleAction }]
+   //  handlers: [ { verb: "doAction", handleActionInvoked: handleAction }]
   }
 });
 

@@ -20,8 +20,8 @@ import { MessageBuilder } from "./sdk/messageBuilder";
 export class HelloWorldCommand implements TeamsFxBotCommandHandler {
   triggerPatterns: TriggerPatterns = "helloWorld";
   actionHandlers: CardActionHandler[] = [
-    { verb: "doAction1", callback: this.handleAction1 },
-    { verb: "doAction2", callback: this.handleAction2 }
+    { verb: "doAction1", handleActionInvoked: this.handleAction1 },
+    { verb: "doAction2", handleActionInvoked: this.handleAction2 }
   ];
 
   async handleCommandReceived(

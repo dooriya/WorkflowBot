@@ -4,7 +4,7 @@ import { CardActionOptions } from "./interface";
 
 export interface CardActionHandler {
     verb: string;
-    callback: (context: TurnContext, cardData: any) => Promise<any>;
+    handleActionInvoked(context: TurnContext, cardData: any): Promise<any>;
 }
 
 export class ActionBot {
