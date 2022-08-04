@@ -8,11 +8,11 @@ export interface IActionRegistry {
 
 export class ActionRegistry implements IActionRegistry{
     registry: CardActionHandler[] = [];
-    registerHandler(id: string, callback: (context: TurnContext, cardData: any) => Promise<any>): this {
+    registerHandler(id: string, handleActionInvoked: (context: TurnContext, cardData: any) => Promise<any>): this {
         if (id) {           
             const actionHandler: CardActionHandler = {
                 verb: id,
-                callback: callback
+                handleActionInvoked: handleActionInvoked
             };
 
             this.registry.push(actionHandler);

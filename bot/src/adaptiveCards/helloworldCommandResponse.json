@@ -17,8 +17,24 @@
         "actions": [
           {
             "type": "Action.Execute",
-            "verb": "doAction1",
-            "title": "DoAction1",
+            "verb": "doAction1a",
+            "title": "DoAction1a",
+            "data": {
+                "key1": "value1"
+            }
+          },
+          {
+            "type": "Action.Execute",
+            "verb": "doAction1b",
+            "title": "DoAction1b",
+            "data": {
+                "key1": "value1"
+            }
+          },
+          {
+            "type": "Action.Execute",
+            "verb": "doAction1c",
+            "title": "DoAction1c",
             "data": {
                 "key1": "value1"
             }
