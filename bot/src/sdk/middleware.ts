@@ -151,7 +151,7 @@ export class CommandResponseMiddleware implements Middleware {
           const card = await action.handleActionReceived(actionData, context);
           const response: InvokeResponse = this.createInvokeResponse(card);
 
-          if (action.type === "submit") {
+          if (!action.refresh) {
             const activity = MessageFactory.attachment(CardFactory.adaptiveCard(card));
             activity.id = context.activity.replyToId;
             await context.updateActivity(activity);

@@ -136,11 +136,9 @@ export interface TeamsFxBotCommandHandler {
   ): Promise<string | Partial<Activity> | void>;
 }
 
-export type TeamsFxWorkflowActionType = "refresh" | "submit";
-
 export interface TeamsFxBotActionHandler {
   verb: string;
-  type: TeamsFxWorkflowActionType;
+  refresh?: boolean;
 
   handleActionReceived(cardData: any, context: TurnContext): Promise<IAdaptiveCard>;
 }
