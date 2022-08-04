@@ -27,8 +27,8 @@
           },
           {
             "type": "Action.Execute",
-            "verb": "doAction",
-            "title": "doAction",
+            "verb": "doAction1",
+            "title": "DoAction1",
             "data": {
                 "key1": "value1"
             }
