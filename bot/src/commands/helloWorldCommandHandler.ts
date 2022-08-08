@@ -1,4 +1,4 @@
-import { Activity, TurnContext } from "botbuilder";
+import { Activity, CardFactory, CloudAdapterBase, MessageFactory, TurnContext } from "botbuilder";
 import {
   CommandMessage,
   TeamsFxBotCommandHandler,
@@ -6,8 +6,8 @@ import {
 } from "../sdk/interface"
 import { AdaptiveCards } from "@microsoft/adaptivecards-tools";
 import helloWorldCommandResponseCard from "../adaptiveCards/helloworldCommandResponse.json";
-import submitActionResponseCard from "../adaptiveCards/submitActionResponse.json";
-import getStatusActionResponseCard from "../adaptiveCards/getStatusActionResponse.json";
+import refreshResponseCard from "../adaptiveCards/refreshResponse.json";
+import doActionResponseCard from "../adaptiveCards/actionResponse.json";
 import { CardData } from "../cardModels";
 import { CardActionHandler } from "../sdk/actionHandler";
 import { MessageBuilder } from "../sdk/messageBuilder";
@@ -20,10 +20,9 @@ import { MessageBuilder } from "../sdk/messageBuilder";
 export class HelloWorldCommand implements TeamsFxBotCommandHandler {
   triggerPatterns: TriggerPatterns = "helloWorld";
   actionHandlers: CardActionHandler[] = [
-    { verb: "submit", callback: this.handleSubmitAction },
-    { verb: "getStatus", callback: this.handleGetStatusAction }
+    { verb: "refresh", handleActionInvoked: this.handleRefreshAction },
+    { verb: "submit", handleActionInvoked: this.handleSubmitAction }
   ];
-
 
   async handleCommandReceived(
     context: TurnContext,
@@ -34,24 +33,34 @@ export class HelloWorldCommand implements TeamsFxBotCommandHandler {
     // Render your adaptive card for reply message
     const cardData: CardData = {
       title: "Your Hello World Bot is Running",
-      body: "Congratulations! Your hello world bot is running. You cal click the `submit` button bellow to trigger an async action."
+      body: "Congratulations! Your hello world bot is running.",
+      userMRI: context.activity.from.id,
     };
 
     return MessageBuilder.attachAdaptiveCard<CardData>(helloWorldCommandResponseCard, cardData);
   }
 
-  // @WorkflowStep("submit")
-  async handleSubmitAction(context: TurnContext, cardData: any): Promise<any> {
-    const responseCard = AdaptiveCards.declare(submitActionResponseCard).render(cardData);
-    return responseCard;
+  async handleRefreshAction(context: TurnContext, cardData: any): Promise<any> {
+    const userId = context.activity.from.id;
+    switch (userId) {
+      case "userA's id":  // refresh for userA specific view
+        // return cardB;
+      case "userB's id":  // refresh for userB specific view
+        // return cardA;
+      default:            // refresh for all refresh users defined in userIds 
+          const responseCard = AdaptiveCards.declare(refreshResponseCard).render(cardData);
+          return responseCard;
+    } 
   }
 
-  // @WorkflowStep("getStatus")
-  async handleGetStatusAction(context: TurnContext, cardData: any): Promise<any> {
-    // Mock API call to retrieve async action execution status
-    const actionStatus = "In Progress";
-    const data = { status: actionStatus };
-    const responseCard = AdaptiveCards.declare(getStatusActionResponseCard).render(data);
+  async handleSubmitAction(context: TurnContext, cardData: any): Promise<any> {
+    const responseCard = AdaptiveCards.declare(doActionResponseCard).render(cardData);
+
+    // optionally, you can use message edit to update the message for all users
+    const rejectedActivity = MessageFactory.attachment(CardFactory.adaptiveCard(responseCard));
+    rejectedActivity.id = context.activity.replyToId;;
+    await context.updateActivity(rejectedActivity);
+
     return responseCard;
   }
 }

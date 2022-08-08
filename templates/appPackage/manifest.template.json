@@ -44,10 +44,6 @@
                         {
                             "title": "helloWorld",
                             "description": "A helloworld command to send a welcome message and handle actions"
-                        },
-                        {
-                            "title": "getStatus",
-                            "description": "Poll status of your async action execution"
                         }
                     ]
                 }

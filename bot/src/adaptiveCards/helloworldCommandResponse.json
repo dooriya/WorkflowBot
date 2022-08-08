@@ -1,5 +1,13 @@
 {
     "type": "AdaptiveCard",
+    "refresh": {
+      "action": {
+        "type": "Action.Execute",
+        "title": "Refresh",
+        "verb": "refresh"
+      },
+      "userIds": [ "${userMRI}" ]
+    },
     "body": [
       {
         "type": "TextBlock",
@@ -11,16 +19,6 @@
         "type": "TextBlock",
         "text": "${body}",
         "wrap": true
-      },
-      {
-        "type": "ActionSet",
-        "actions": [
-          {
-            "type": "Action.Execute",
-            "verb": "submit",
-            "title": "Submit"
-          }
-        ]
       }
     ],
     "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",

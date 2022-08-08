@@ -5,4 +5,5 @@
  export interface CardData {
   title: string;
   body: string;
+  userMRI: string; 
 }

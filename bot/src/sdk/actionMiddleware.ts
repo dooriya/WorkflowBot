@@ -17,7 +17,7 @@ export class ActionMiddleware implements Middleware  {
 
             if (this.actionHandlers.has(verb)) {
                 const handler = this.actionHandlers.get(verb);
-                const responseCard = await handler.callback(context, action.data);
+                const responseCard = await handler.handleActionInvoked(context, action.data);
                 const invokeResponse = this.createAdaptiveCardInvokeResponse(responseCard);
 
                 await context.sendActivity({
