@@ -1,4 +1,4 @@
-import { HelloWorldActionHandler } from "../actions/helloworldActionHandler";
+import { HelloWorldCardActionHandler } from "../cardActions/helloworldActionHandler";
 import { HelloWorldCommandHandler } from "../commands/helloworldCommandHandler";
 import { ConversationBot } from "../sdk/conversation";
 
@@ -18,6 +18,6 @@ export const commandBot = new ConversationBot({
   },
   cardAction: {
     enabled: true,
-    actions: [new HelloWorldActionHandler()],
+    actions: [new HelloWorldCardActionHandler()],
   }
 });
