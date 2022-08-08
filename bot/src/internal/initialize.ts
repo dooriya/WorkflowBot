@@ -1,7 +1,6 @@
-import { HelloWorldAction1aHandler } from "../actions/helloworldAction1aHandler";
-import { HelloWorldAction1bHandler } from "../actions/helloworldAction1bHandler";
-import { HelloWorldAction1cHandler } from "../actions/helloworldAction1cHandler";
-import { HelloWorldAction2Handler } from "../actions/helloworldAction2Handler";
+import { HelloWorldCardAction1aHandler } from "../cardActions/helloworldCardAction1aHandler";
+import { HelloWorldCardAction1bHandler } from "../cardActions/helloworldCardAction1bHandler";
+import { HelloWorldCardAction2Handler } from "../cardActions/helloworldCardAction2Handler";
 import { HelloWorldCommandHandler } from "../commands/helloworldCommandHandler";
 import { ConversationBot } from "../sdk/conversation";
 
@@ -22,10 +21,9 @@ export const commandBot = new ConversationBot({
   cardAction: {
     enabled: true,
     actions: [
-      new HelloWorldAction1aHandler(),
-      new HelloWorldAction1bHandler(),
-      new HelloWorldAction1cHandler(),
-      new HelloWorldAction2Handler()
+      new HelloWorldCardAction1aHandler(),
+      new HelloWorldCardAction1bHandler(),
+      new HelloWorldCardAction2Handler()
     ],
   }
 });
