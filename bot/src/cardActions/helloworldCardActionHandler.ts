@@ -10,7 +10,6 @@ import { TeamsFxBotCardActionHandler } from "../sdk/interface";
  */
 export class HelloWorldCardActionHandler implements TeamsFxBotCardActionHandler {
     triggerVerb: string = "auto-refresh";
-    refresh = true;
 
     async handleActionReceived(actionData: any, context: TurnContext): Promise<IAdaptiveCard | void> {
         return AdaptiveCards.declare(helloWorldCard).render(actionData);
