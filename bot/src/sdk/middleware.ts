@@ -207,7 +207,7 @@ export class CardActionMiddleware implements Middleware {
           if (card) {
             const response: InvokeResponse = this.createInvokeResponse(card);
 
-            if (!action.refresh) {
+            if (action.updateCardToAllReceivers) {
               const activity = MessageFactory.attachment(CardFactory.adaptiveCard(card));
               activity.id = context.activity.replyToId;
               await context.updateActivity(activity);
