@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { Activity, ActivityTypes, CardFactory, InvokeResponse, INVOKE_RESPONSE_KEY, MessageFactory, Middleware, StatusCodes, TurnContext } from "botbuilder";
+import { Activity, ActivityTypes, CardFactory, InvokeResponse, MessageFactory, Middleware, StatusCodes, TurnContext } from "botbuilder";
 import { CommandMessage, TeamsFxBotCardActionHandler, TeamsFxBotCommandHandler, TriggerPatterns } from "./interface";
 import { ConversationReferenceStore } from "./storage";
 import { cloneConversation } from "./utils";
@@ -207,7 +207,7 @@ export class CardActionMiddleware implements Middleware {
           if (card) {
             const response: InvokeResponse = this.createInvokeResponse(card);
 
-            if (!action.refresh) {
+            if (action.updateCardToAllReceivers) {
               const activity = MessageFactory.attachment(CardFactory.adaptiveCard(card));
               activity.id = context.activity.replyToId;
               await context.updateActivity(activity);

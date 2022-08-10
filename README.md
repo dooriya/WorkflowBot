@@ -188,7 +188,6 @@ import card2 from "../adaptiveCards/card2.json";
 
 export class Handler1 implements TeamsFxBotCardActionHandler { 
     triggerVerb: string = "auto-refresh"; 
-    refresh = true; 
  
     async handleActionReceived(actionData: any, context: TurnContext): Promise<IAdaptiveCard | void> { 
         return AdaptiveCards.declare(card2).render(actionData); 
@@ -196,9 +195,6 @@ export class Handler1 implements TeamsFxBotCardActionHandler {
 } 
 ```
  
-
-Set refresh is true for `Handler 1` since it`s an auto-refreshed action and the new card `Card 2` will be returned to specific users only. 
-
 ### Step 3: register the action handler 
 
 bot/src/internal/initialize.ts 
