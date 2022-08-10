@@ -138,7 +138,13 @@ export interface TeamsFxBotCommandHandler {
 
 export interface TeamsFxBotCardActionHandler {
   triggerVerb: string;
-  refresh?: boolean;
+
+  /**
+   * * Default to false, the card needs be updated **only** for receiver operates on the card.
+   * * Set to true if the card needs to be updated for **all** receivers.
+   * * Refer to https://aka.ms/place-holder if the card needs to be updated for particular receivers.
+   */
+  updateCardToAllReceivers?: boolean;
 
   handleActionReceived(cardData: any, context: TurnContext): Promise<IAdaptiveCard | void>;
 }
