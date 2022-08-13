@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { Activity, ActivityTypes, CardFactory, InvokeResponse, MessageFactory, Middleware, StatusCodes, TurnContext } from "botbuilder";
-import { CommandMessage, TeamsFxBotCardActionHandler, TeamsFxBotCommandHandler, TriggerPatterns } from "./interface";
+import { ActionTypes, Activity, ActivityTypes, CardFactory, InvokeResponse, MessageFactory, Middleware, StatusCodes, TurnContext } from "botbuilder";
+import { CommandMessage, TeamsFxBotCardActionHandler, TeamsFxBotCardBehavior, TeamsFxBotCommandHandler, TriggerPatterns } from "./interface";
 import { ConversationReferenceStore } from "./storage";
 import { cloneConversation } from "./utils";
 
@@ -204,40 +204,61 @@ export class CardActionMiddleware implements Middleware {
       for (const action of this.actionHandlers) {
         if (actionVerb === action.triggerVerb) {
           const card = await action.handleActionReceived(actionData, context);
-          if (card) {
-            const response: InvokeResponse = this.createInvokeResponse(card);
+          if (!card) {
+            // return empty invoke response
+            await this.sendInvokeResponse(null, context);
+          }
 
-            if (action.updateCardToAllReceivers) {
-              const activity = MessageFactory.attachment(CardFactory.adaptiveCard(card));
+          const activity = MessageFactory.attachment(CardFactory.adaptiveCard(card));
+          switch (action.cardBehavior) {
+            case TeamsFxBotCardBehavior.SendNewCard:
+              await context.sendActivity(activity);
+              await this.sendInvokeResponse(null, context);
+              break;
+
+            case TeamsFxBotCardBehavior.UpdateCardToAllReceivers:
               activity.id = context.activity.replyToId;
               await context.updateActivity(activity);
-            }
+              await this.sendInvokeResponse(card, context);
+              break;
 
-            // return invoke response
-            await context.sendActivity({
-              type: ActivityTypes.InvokeResponse,
-              value: response,
-            });
+            default:
+              await this.sendInvokeResponse(card, context);
+              break;
           }
         }
       }
     }
-
     await next();
   }
 
+  private async sendInvokeResponse(card: any, context: TurnContext): Promise<void> {
+    const response: InvokeResponse = this.createInvokeResponse(card);
+    await context.sendActivity({
+      type: ActivityTypes.InvokeResponse,
+      value: response
+    });
+  }
+
   private createInvokeResponse(card: any): InvokeResponse<any> {
-    const cardRes = {
-      statusCode: StatusCodes.OK,
-      type: 'application/vnd.microsoft.card.adaptive',
-      value: card
-    };
-
-    const res = {
-      status: StatusCodes.OK,
-      body: cardRes
-    };
-
-    return res;
+    if (card) {
+      return {
+        status: StatusCodes.OK,
+        body: {
+          statusCode: StatusCodes.OK,
+          type: 'application/vnd.microsoft.card.adaptive',
+          value: card
+        }
+      };
+    } else {
+      return {
+        status: StatusCodes.OK,
+        body: {
+          statusCode: StatusCodes.OK,
+          type: 'application/vnd.microsoft.activity.message',
+          value: 'Your response was sent to the app'
+        }
+      };
+    }
   }
 }

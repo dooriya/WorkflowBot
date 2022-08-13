@@ -136,15 +136,36 @@ export interface TeamsFxBotCommandHandler {
   ): Promise<string | Partial<Activity> | void>;
 }
 
+/**
+ * The behavior of the card displays in Teams conversation.
+*/
+export enum TeamsFxBotCardBehavior {
+  /**
+   * The card will be updated only for receiver operates on the card.
+  */
+  Default,
+
+  /**
+   * The card will be updated for all receivers.
+  */
+  UpdateCardToAllReceivers,
+
+  /**
+   * A new card will sent instead of updating the original card.
+  */
+  SendNewCard
+}
+
 export interface TeamsFxBotCardActionHandler {
+  /**
+   * The action verb that can trigger this handler.
+  */
   triggerVerb: string;
 
   /**
-   * * Default to false, the card needs be updated **only** for receiver operates on the card.
-   * * Set to true if the card needs to be updated for **all** receivers.
-   * * Refer to https://aka.ms/place-holder if the card needs to be updated for particular receivers.
-   */
-  updateCardToAllReceivers?: boolean;
+   * The behavior of the card displays in Teams conversation.
+  */
+  cardBehavior?: TeamsFxBotCardBehavior;
 
   handleActionReceived(cardData: any, context: TurnContext): Promise<IAdaptiveCard | void>;
 }
