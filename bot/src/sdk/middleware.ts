@@ -247,7 +247,8 @@ export class CardActionMiddleware implements Middleware {
         body: {
           statusCode: StatusCodes.OK,
           type: 'application/vnd.microsoft.card.adaptive',
-          value: card
+          value: card,
+          version: "1.4"
         }
       };
     } else {
