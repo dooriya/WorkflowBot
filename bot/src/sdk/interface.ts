@@ -3,7 +3,7 @@
 
 import { BotFrameworkAdapter } from "botbuilder";
 import { Activity, TurnContext } from "botbuilder-core";
-import { IAdaptiveCard } from "adaptivecards";
+import { TeamsFxAdaptiveCardActionHandler } from "./cardActionHandler";
 
 /**
  * The target type where the notification will be sent to.
@@ -137,40 +137,6 @@ export interface TeamsFxBotCommandHandler {
 }
 
 /**
- * The behavior of the card displays in Teams conversation.
-*/
-export enum AdaptiveCardResponseBehavior {
-  /**
-   * The card will be updated only for receiver operates on the card.
-  */
-  Default,
-
-  /**
-   * The card will be updated for all receivers.
-  */
-  UpdateCardToAllReceivers,
-
-  /**
-   * A separate card will be sent instead of updating the original card.
-  */
-  SendAsSeparateCard
-}
-
-export interface TeamsFxAdaptiveCardActionHandler {
-  /**
-   * The action verb that can trigger this handler.
-  */
-  triggerVerb: string;
-
-  /**
-   * The behavior of the card displays in Teams conversation.
-  */
-  cardResponseBehavior?: AdaptiveCardResponseBehavior;
-
-  handleActionReceived(cardData: any, context: TurnContext): Promise<IAdaptiveCard | void>;
-}
-
-/**
  * Options to initialize {@link CommandBot}.
  */
 export interface CommandOptions {
@@ -184,7 +150,10 @@ export interface CommandOptions {
  * Options to initialize {@link CardActionBot}.
  */
 export interface CardActionOptions {
-  actions?: TeamsFxAdaptiveCardActionHandler[];
+  /**
+   * The action handlers to registered with the action bot. Each command should implement the interface {@link TeamsFxAdaptiveCardActionHandler} so that it can be correctly handled by this bot.
+   */
+  actions: TeamsFxAdaptiveCardActionHandler[];
 }
 
 /**
@@ -219,14 +188,20 @@ export interface ConversationOptions {
     enabled?: boolean;
   };
 
-  cardAction?: CardActionOptions & {
-    enabled?: boolean;
-  };
-
   /**
    * The notification part.
    */
   notification?: NotificationOptions & {
+    /**
+     * Whether to enable notification or not.
+     */
+    enabled?: boolean;
+  };
+
+  /**
+   * The adaptive card action handler part.
+   */
+   cardAction?: CardActionOptions & {
     /**
      * Whether to enable notification or not.
      */

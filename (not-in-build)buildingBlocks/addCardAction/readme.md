@@ -1,8 +1,4 @@
-# Hello World Workflow Bot
-
-The Adaptive Card action handler feature enables the app to respond to adaptive card actions that triggered by end users to complete a sequential workflow. 
-
-## Respond to Adaptive Card Actions
+# Add more actions to your bot
 
 When user gets an Adaptive Card, it can provide one or more buttons in the card to ask for user's input, do something like calling some APIs, and then send another adaptive card in conversation.
 
@@ -42,13 +38,13 @@ Please note:
 * If an Adaptive Card is returned, then the existing card will be replaced with it by default.
 
 ```typescript
-import card2 from "../adaptiveCards/card2.json"; 
+import myResponseCard1 from "../adaptiveCards/myResponseCard1.json"; 
 
 export class Handler1 implements TeamsFxAdaptiveCardActionHandler { 
     triggerVerb = "doAction1";
 
     async handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | void> { 
-        return AdaptiveCards.declare(card2).render(actionData); 
+        return AdaptiveCards.declare(myResponseCard1).render(actionData); 
     } 
 } 
 ```

@@ -70,14 +70,14 @@ export class ConversationBot {
   public readonly command?: CommandBot;
 
   /**
-   * The entrypoint of card action.
-   */
-  public readonly cardAction?: CardActionBot;
-
-  /**
    * The entrypoint of notification.
    */
   public readonly notification?: NotificationBot;
+
+  /**
+   * The action handler used for adaptive card universal actions.
+   */
+  public readonly cardAction?: CardActionBot;
 
   /**
    * Creates new instance of the `ConversationBot`.
@@ -98,12 +98,12 @@ export class ConversationBot {
       this.command = new CommandBot(this.adapter, options.command);
     }
 
-    if (options.cardAction?.enabled) {
-      this.cardAction = new CardActionBot(this.adapter, options.cardAction);
-    }
-
     if (options.notification?.enabled) {
       this.notification = new NotificationBot(this.adapter, options.notification);
+    }
+
+    if (options.cardAction?.enabled) {
+      this.cardAction = new CardActionBot(this.adapter, options.cardAction);
     }
   }
 

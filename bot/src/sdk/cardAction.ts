@@ -1,20 +1,15 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
-
 import { BotFrameworkAdapter } from "botbuilder";
-import { CardActionOptions, TeamsFxAdaptiveCardActionHandler } from "./interface";
-import { CardActionMiddleware } from "./middleware";
+import { TeamsFxAdaptiveCardActionHandler } from "./cardActionHandler";
+import { CardActionMiddleware } from "./cardActionMiddleware";
+import { CardActionOptions } from "./interface";
 
 /**
- * A command bot for receiving commands and sending responses in Teams.
- *
- * @remarks
- * Ensure each command should ONLY be registered with the command once, otherwise it'll cause unexpected behavior if you register the same command more than once.
+ * A card action bot for processing card actions in adaptive card.
  */
 export class CardActionBot {
     private readonly adapter: BotFrameworkAdapter;
-    private readonly middleware: CardActionMiddleware;
-
+    private middleware: CardActionMiddleware;
+  
     /**
      * Creates a new instance of the `CardActionBot`.
      *
@@ -27,24 +22,22 @@ export class CardActionBot {
     }
 
     /**
-     * Registers an action into the card action bot.
-     *
-     * @param action The action to registered.
+     * Registers a card action handler to the bot.
+     * @param actionHandler A card action handlers to be registered.
      */
-    public registerAction(action: TeamsFxAdaptiveCardActionHandler): void {
-        if (action) {
-            this.middleware.actionHandlers.push(action);
+    registerHandler(actionHandler: TeamsFxAdaptiveCardActionHandler) {
+        if (actionHandler) {
+            this.middleware.actionHandlers.push(actionHandler);
         }
     }
 
     /**
-     * Registers actions into the card action bot.
-     *
-     * @param actions The actions to registered.
+     * Registers card action handlers to the bot.
+     * @param actionHandlers A set of card action handlers to be registered.
      */
-    public registerActions(actions: TeamsFxAdaptiveCardActionHandler[]): void {
-        if (actions) {
-            this.middleware.actionHandlers.push(...actions);
+    registerHandlers(actionHandlers: TeamsFxAdaptiveCardActionHandler[]) {
+        if (actionHandlers) {
+            this.middleware.actionHandlers.push(...actionHandlers);
         }
     }
 }

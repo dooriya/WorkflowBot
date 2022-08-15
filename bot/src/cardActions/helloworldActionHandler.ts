@@ -1,8 +1,9 @@
 import { AdaptiveCards } from "@microsoft/adaptivecards-tools";
 import { IAdaptiveCard } from "adaptivecards";
 import { TurnContext } from "botbuilder";
-import helloWorldCard from "../adaptiveCards/helloworldCardAction.json";
-import { TeamsFxAdaptiveCardActionHandler, AdaptiveCardResponseBehavior } from "../sdk/interface";
+import helloWorldCard from "../adaptiveCards/helloworldCardResponse.json";
+import { AdaptiveCardResponse, TeamsFxAdaptiveCardActionHandler } from "../sdk/cardActionHandler";
+
 
 /**
  * The `HelloWorldCardActionHandler` registers an action with the `TeamsFxBotActionHandler` and responds
@@ -10,9 +11,9 @@ import { TeamsFxAdaptiveCardActionHandler, AdaptiveCardResponseBehavior } from "
  */
 export class HelloWorldCardActionHandler implements TeamsFxAdaptiveCardActionHandler {
     triggerVerb = "acknowledged";
-    cardResponseBehavior = AdaptiveCardResponseBehavior.Default;
+    adaptiveCardResponse = AdaptiveCardResponse.ReplaceForInteractor;
 
-    async handleActionReceived(actionData: any, context: TurnContext): Promise<IAdaptiveCard | void> {
+    async handleActionInvoked(context: TurnContext, actionData: any): Promise<void | IAdaptiveCard> {
         return AdaptiveCards.declare(helloWorldCard).render(actionData);
     }
 }
