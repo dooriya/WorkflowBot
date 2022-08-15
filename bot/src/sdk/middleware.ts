@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { ActionTypes, Activity, ActivityTypes, CardFactory, InvokeResponse, MessageFactory, Middleware, StatusCodes, TurnContext } from "botbuilder";
-import { CommandMessage, TeamsFxBotCardActionHandler, TeamsFxBotCardBehavior, TeamsFxBotCommandHandler, TriggerPatterns } from "./interface";
+import { CommandMessage, TeamsFxAdaptiveCardActionHandler, AdaptiveCardResponseBehavior, TeamsFxBotCommandHandler, TriggerPatterns } from "./interface";
 import { ConversationReferenceStore } from "./storage";
 import { cloneConversation } from "./utils";
 
@@ -188,9 +188,9 @@ export class CommandResponseMiddleware implements Middleware {
 }
 
 export class CardActionMiddleware implements Middleware {
-  public readonly actionHandlers: TeamsFxBotCardActionHandler[] = [];
+  public readonly actionHandlers: TeamsFxAdaptiveCardActionHandler[] = [];
 
-  constructor(handlers?: TeamsFxBotCardActionHandler[]) {
+  constructor(handlers?: TeamsFxAdaptiveCardActionHandler[]) {
     if (handlers && handlers.length > 0) {
       this.actionHandlers.push(...handlers);
     }
@@ -210,13 +210,13 @@ export class CardActionMiddleware implements Middleware {
           }
 
           const activity = MessageFactory.attachment(CardFactory.adaptiveCard(card));
-          switch (action.cardBehavior) {
-            case TeamsFxBotCardBehavior.SendNewCard:
+          switch (action.cardResponseBehavior) {
+            case AdaptiveCardResponseBehavior.SendAsSeparateCard:
               await context.sendActivity(activity);
               await this.sendInvokeResponse(null, context);
               break;
 
-            case TeamsFxBotCardBehavior.UpdateCardToAllReceivers:
+            case AdaptiveCardResponseBehavior.UpdateCardToAllReceivers:
               activity.id = context.activity.replyToId;
               await context.updateActivity(activity);
               await this.sendInvokeResponse(card, context);

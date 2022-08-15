@@ -139,7 +139,7 @@ export interface TeamsFxBotCommandHandler {
 /**
  * The behavior of the card displays in Teams conversation.
 */
-export enum TeamsFxBotCardBehavior {
+export enum AdaptiveCardResponseBehavior {
   /**
    * The card will be updated only for receiver operates on the card.
   */
@@ -151,12 +151,12 @@ export enum TeamsFxBotCardBehavior {
   UpdateCardToAllReceivers,
 
   /**
-   * A new card will sent instead of updating the original card.
+   * A separate card will be sent instead of updating the original card.
   */
-  SendNewCard
+  SendAsSeparateCard
 }
 
-export interface TeamsFxBotCardActionHandler {
+export interface TeamsFxAdaptiveCardActionHandler {
   /**
    * The action verb that can trigger this handler.
   */
@@ -165,7 +165,7 @@ export interface TeamsFxBotCardActionHandler {
   /**
    * The behavior of the card displays in Teams conversation.
   */
-  cardBehavior?: TeamsFxBotCardBehavior;
+  cardResponseBehavior?: AdaptiveCardResponseBehavior;
 
   handleActionReceived(cardData: any, context: TurnContext): Promise<IAdaptiveCard | void>;
 }
@@ -184,7 +184,7 @@ export interface CommandOptions {
  * Options to initialize {@link CardActionBot}.
  */
 export interface CardActionOptions {
-  actions?: TeamsFxBotCardActionHandler[];
+  actions?: TeamsFxAdaptiveCardActionHandler[];
 }
 
 /**

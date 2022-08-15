@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { BotFrameworkAdapter } from "botbuilder";
-import { CardActionOptions, TeamsFxBotCardActionHandler } from "./interface";
+import { CardActionOptions, TeamsFxAdaptiveCardActionHandler } from "./interface";
 import { CardActionMiddleware } from "./middleware";
 
 /**
@@ -31,7 +31,7 @@ export class CardActionBot {
      *
      * @param action The action to registered.
      */
-    public registerAction(action: TeamsFxBotCardActionHandler): void {
+    public registerAction(action: TeamsFxAdaptiveCardActionHandler): void {
         if (action) {
             this.middleware.actionHandlers.push(action);
         }
@@ -42,7 +42,7 @@ export class CardActionBot {
      *
      * @param actions The actions to registered.
      */
-    public registerActions(actions: TeamsFxBotCardActionHandler[]): void {
+    public registerActions(actions: TeamsFxAdaptiveCardActionHandler[]): void {
         if (actions) {
             this.middleware.actionHandlers.push(...actions);
         }
