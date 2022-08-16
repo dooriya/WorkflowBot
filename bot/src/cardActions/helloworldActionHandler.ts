@@ -11,7 +11,7 @@ import { TeamsFxAdaptiveCardActionHandler, AdaptiveCardResponse } from "../sdk/i
 export class HelloWorldCardActionHandler implements TeamsFxAdaptiveCardActionHandler {
     triggerVerb = "acknowledged";
 
-    async handleActionReceived(actionData: any, context: TurnContext): Promise<IAdaptiveCard | void> {
+    async handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | void> {
         return AdaptiveCards.declare(helloWorldCard).render(actionData);
     }
 }

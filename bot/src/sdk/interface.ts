@@ -172,7 +172,7 @@ export interface TeamsFxAdaptiveCardActionHandler {
    * @param context The turn context.
    * @param actionData The contextual data that associated with the action.
   */
-  handleActionReceived(actionData: any, context: TurnContext): Promise<IAdaptiveCard | void>;
+  handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | void>;
 }
 
 /**

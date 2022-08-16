@@ -43,7 +43,7 @@ import card2 from "../adaptiveCards/card2.json";
 export class Handler1 implements TeamsFxAdaptiveCardActionHandler { 
     triggerVerb = "doAction1";
 
-    async handleActionReceived(actionData: any, context: TurnContext): Promise<IAdaptiveCard | void> { 
+    async handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | void> { 
         return AdaptiveCards.declare(card2).render(actionData); 
     } 
 } 

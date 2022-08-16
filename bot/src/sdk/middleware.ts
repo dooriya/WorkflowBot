@@ -203,7 +203,7 @@ export class CardActionMiddleware implements Middleware {
 
       for (const action of this.actionHandlers) {
         if (actionVerb === action.triggerVerb) {
-          const card = await action.handleActionReceived(actionData, context);
+          const card = await action.handleActionInvoked(context, actionData);
           if (!card) {
             // return empty invoke response
             await this.sendInvokeResponse(null, context);
