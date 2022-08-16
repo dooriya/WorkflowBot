@@ -139,35 +139,40 @@ export interface TeamsFxBotCommandHandler {
 /**
  * The behavior of the card displays in Teams conversation.
 */
-export enum AdaptiveCardResponseBehavior {
+export enum AdaptiveCardResponse {
   /**
-   * The card will be updated only for receiver operates on the card.
+   * The card will be replaced only for interactor.
   */
-  Default,
+  ReplaceForInteractor,
 
   /**
-   * The card will be updated for all receivers.
+   * The card will be replaced for all receivers.
   */
-  UpdateCardToAllReceivers,
+  ReplaceForAll,
 
   /**
-   * A separate card will be sent instead of updating the original card.
+   * A separate new card will be sent for all receivers.
   */
-  SendAsSeparateCard
+  NewForAll
 }
 
 export interface TeamsFxAdaptiveCardActionHandler {
   /**
-   * The action verb that can trigger this handler.
+   * The verb defined in adaptive card action that can trigger this handler.
   */
   triggerVerb: string;
 
   /**
-   * The behavior of the card displays in Teams conversation.
+   * The behavior for how the card response will be sent in Teams conversation.
   */
-  cardResponseBehavior?: AdaptiveCardResponseBehavior;
+  adaptiveCardResponse?: AdaptiveCardResponse;
 
-  handleActionReceived(cardData: any, context: TurnContext): Promise<IAdaptiveCard | void>;
+  /**
+   * The handler function that will be invoked when the action is fired.
+   * @param context The turn context.
+   * @param actionData The contextual data that associated with the action.
+  */
+  handleActionReceived(actionData: any, context: TurnContext): Promise<IAdaptiveCard | void>;
 }
 
 /**
