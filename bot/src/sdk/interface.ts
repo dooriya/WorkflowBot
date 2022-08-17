@@ -172,7 +172,24 @@ export interface TeamsFxAdaptiveCardActionHandler {
    * @param context The turn context.
    * @param actionData The contextual data that associated with the action.
   */
-  handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | void>;
+  handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | CardPromptMessage | void>;
+}
+
+
+/**
+ * A prompt message displayed under the adaptive card. 
+*/
+export interface CardPromptMessage {
+  text: string;
+  style: CardPromptStyle;
+}
+
+/**
+ * The style of the card prompt message. 
+*/
+export enum CardPromptStyle {
+  Info,
+  Error
 }
 
 /**

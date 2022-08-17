@@ -2,9 +2,10 @@
 // Licensed under the MIT license.
 
 import { ActionTypes, Activity, ActivityTypes, CardFactory, InvokeResponse, MessageFactory, Middleware, StatusCodes, TurnContext } from "botbuilder";
-import { CommandMessage, TeamsFxAdaptiveCardActionHandler, AdaptiveCardResponse, TeamsFxBotCommandHandler, TriggerPatterns } from "./interface";
+import { CommandMessage, TeamsFxAdaptiveCardActionHandler, AdaptiveCardResponse, TeamsFxBotCommandHandler, TriggerPatterns, CardPromptMessage, CardPromptStyle } from "./interface";
 import { ConversationReferenceStore } from "./storage";
 import { cloneConversation } from "./utils";
+import { IAdaptiveCard } from "adaptivecards";
 
 /**
  * @internal
@@ -189,6 +190,10 @@ export class CommandResponseMiddleware implements Middleware {
 
 export class CardActionMiddleware implements Middleware {
   public readonly actionHandlers: TeamsFxAdaptiveCardActionHandler[] = [];
+  private readonly defaultCardMessage: CardPromptMessage = {
+    text: "Your response was sent to the app",
+    style: CardPromptStyle.Info
+  };
 
   constructor(handlers?: TeamsFxAdaptiveCardActionHandler[]) {
     if (handlers && handlers.length > 0) {
@@ -204,27 +209,34 @@ export class CardActionMiddleware implements Middleware {
       for (const action of this.actionHandlers) {
         if (actionVerb === action.triggerVerb) {
           const card = await action.handleActionInvoked(context, actionData);
-          if (!card) {
-            // return empty invoke response
-            await this.sendInvokeResponse(null, context);
+          if (!card || this.instanceOfCardPromptMessage(card)) {
+            // return card prompt message
+            await this.sendInvokeResponse(context, card || this.defaultCardMessage);
+            return await next();
+          }
+
+          if (card.refresh && action.adaptiveCardResponse !== AdaptiveCardResponse.NewForAll) {
+            // Card won't be refreshed with AdaptiveCardResponse.ReplaceForInteractor.
+            // So set to AdaptiveCardResponse.ReplaceForAll here.
+            action.adaptiveCardResponse = AdaptiveCardResponse.ReplaceForAll;
           }
 
           const activity = MessageFactory.attachment(CardFactory.adaptiveCard(card));
           switch (action.adaptiveCardResponse) {
             case AdaptiveCardResponse.NewForAll:
               await context.sendActivity(activity);
-              await this.sendInvokeResponse(null, context);
+              await this.sendInvokeResponse(context, this.defaultCardMessage);
               break;
 
             case AdaptiveCardResponse.ReplaceForAll:
               activity.id = context.activity.replyToId;
               await context.updateActivity(activity);
-              await this.sendInvokeResponse(card, context);
+              await this.sendInvokeResponse(context, card);
               break;
 
             case AdaptiveCardResponse.ReplaceForInteractor:
             default:
-              await this.sendInvokeResponse(card, context);
+              await this.sendInvokeResponse(context, card);
               break;
           }
         }
@@ -233,7 +245,11 @@ export class CardActionMiddleware implements Middleware {
     await next();
   }
 
-  private async sendInvokeResponse(card: any, context: TurnContext): Promise<void> {
+  private instanceOfCardPromptMessage(card: any): card is CardPromptMessage {
+    return "text" in card && "style" in card;
+  }
+
+  private async sendInvokeResponse(context: TurnContext, card: IAdaptiveCard | CardPromptMessage): Promise<void> {
     const response: InvokeResponse = this.createInvokeResponse(card);
     await context.sendActivity({
       type: ActivityTypes.InvokeResponse,
@@ -241,23 +257,40 @@ export class CardActionMiddleware implements Middleware {
     });
   }
 
-  private createInvokeResponse(card: any): InvokeResponse<any> {
-    if (card) {
+  private createInvokeResponse(card: IAdaptiveCard | CardPromptMessage): InvokeResponse<any> {
+    // refer to: https://docs.microsoft.com/en-us/adaptive-cards/authoring-cards/universal-action-model#response-format
+    if (this.instanceOfCardPromptMessage(card)) {
+      switch (card.style) {
+        case CardPromptStyle.Error:
+          return {
+            status: StatusCodes.OK,
+            body: {
+              statusCode: StatusCodes.BAD_REQUEST,
+              type: 'application/vnd.microsoft.error',
+              value: {
+                code: "BadRequest",
+                message: card.text
+              }
+            }
+          };
+        case CardPromptStyle.Info:
+        default:
+          return {
+            status: StatusCodes.OK,
+            body: {
+              statusCode: StatusCodes.OK,
+              type: 'application/vnd.microsoft.activity.message',
+              value: card.text
+            }
+          };
+      }
+    } else {
       return {
         status: StatusCodes.OK,
         body: {
           statusCode: StatusCodes.OK,
           type: 'application/vnd.microsoft.card.adaptive',
           value: card
-        }
-      };
-    } else {
-      return {
-        status: StatusCodes.OK,
-        body: {
-          statusCode: StatusCodes.OK,
-          type: 'application/vnd.microsoft.activity.message',
-          value: 'Your response was sent to the app'
         }
       };
     }
