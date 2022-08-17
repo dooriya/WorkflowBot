@@ -11,7 +11,7 @@ export enum AdaptiveCardResponse {
      ReplaceForInteractor,
 
     /**
-     * The response card will be replaced the current one for all users in the chat/
+     * The response card will be replaced the current one for all users in the chat.
      */
      ReplaceForAll,
 
