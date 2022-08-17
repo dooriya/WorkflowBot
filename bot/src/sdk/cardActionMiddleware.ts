@@ -48,24 +48,9 @@ export class CardActionMiddleware implements Middleware {
                             default:
                                 await this.sendInvokeResponse(responseCard, context);
                         }
+                    } else {
+                        await this.sendInvokeResponse(null, context);
                     }
-                }
-            }
-        } else if (context.activity.name === "task/fetch" || context.activity.name === "task/submit") {
-            const actionData = context.activity.value.data;
-            var taskInfo: TaskModuleTaskInfo = {};
-
-            for (const handler of this.actionHandlers) {
-                if (actionData.verb == handler.triggerVerb) {
-                    const responseCard = await handler.handleActionInvoked(context, actionData);
-
-                    taskInfo.card = CardFactory.adaptiveCard(responseCard);
-                    taskInfo.title = context.activity.value.name;
-
-                    await context.sendActivity({
-                        type: ActivityTypes.InvokeResponse,
-                        value: this.createTaskModuleInvokeResponse(taskInfo)
-                    });
                 }
             }
         }
@@ -90,26 +75,6 @@ export class CardActionMiddleware implements Middleware {
         }
         
 
-        return undefined;
-    }
-
-    private createTaskModuleInvokeResponse(taskInfo: TaskModuleTaskInfo): InvokeResponse<any> {
-        if (taskInfo) {
-            const taskModuleResponse: TaskModuleResponse = {
-                task: {
-                    type: 'continue',
-                    value: taskInfo
-                }
-            }
-    
-            const invokeResponse = {
-                status: 200,
-                body: taskModuleResponse
-            };
-    
-            return invokeResponse;
-        }
-        
         return undefined;
     }
 
