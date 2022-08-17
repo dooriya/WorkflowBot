@@ -199,15 +199,28 @@ You need to design the user-specific to refresh to specific users (e.g. `card1.j
 ```
 
 ### Step 3: add card action handler to refresh views
+Add handler that implements `TeamsFxAdaptiveCardActionHandler` to process the refresh invoke activity which is automatically triggered in Teams.
 
 ```typescript
 import myResponseCard1 from "../adaptiveCards/card1.json"; 
 
 export class Handler1 implements TeamsFxBotCardActionHandler { 
-    triggerVerb: string = "userViewRefresh"; 
+    triggerVerb: string = "userViewRefresh";
  
     async handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | void> {
-        return AdaptiveCards.declare(card1).render(actionData); 
+      /**
+       * If you have multiple userIds defined in your refresh action, for example: userIds: [ "<UserA>", "<userB>" ] ,
+       * and you can return different card response for those users respectively with the following code sample.
+        
+        const currentUserId = context.activity.from.id;
+        switch (currentUserId) {
+          case "<userA's id>":
+            return AdaptiveCards.declare(card1).render(actionData);
+          case "<userB's id>":
+            return AdaptiveCards.declare(card2).render(actionData);
+        }
+     */
+      return AdaptiveCards.declare(card1).render(actionData); 
     } 
 } 
 ```
