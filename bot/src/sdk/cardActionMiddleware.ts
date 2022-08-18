@@ -40,10 +40,10 @@ export class CardActionMiddleware implements Middleware {
                         return await next();
                     }
 
-                    if (responseCard.refresh && action.adaptiveCardResponse !== AdaptiveCardResponse.NewForAll) {
+                    if (responseCard.refresh && handler.adaptiveCardResponse !== AdaptiveCardResponse.NewForAll) {
                         // Card won't be refreshed with AdaptiveCardResponse.ReplaceForInteractor.
                         // So set to AdaptiveCardResponse.ReplaceForAll here.
-                        action.adaptiveCardResponse = AdaptiveCardResponse.ReplaceForAll;
+                        handler.adaptiveCardResponse = AdaptiveCardResponse.ReplaceForAll;
                     }
 
                     const activity = MessageFactory.attachment(CardFactory.adaptiveCard(responseCard));
