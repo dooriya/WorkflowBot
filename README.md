@@ -307,7 +307,8 @@ async handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdapt
 ```
 
 The response message will be rendered in Teams as below:
-![image](./assets/info-message-response.png)
+
+<img src="./assets/info-message-response.png" alt="info-message-response" width="600"/>
 
 ### Error handling
 Similar to respond with a text message, you can also use `CardPromptMessage` to return an error message if user error occurs in the action invoke. You need to specify `CardPromptMessageType.Error` for the `type` property in your `CardPromptMessage`, for example:
@@ -322,7 +323,8 @@ async handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdapt
 ```
 
 The response message will be rendered in Teams as below:
-![image](./assets/error-message-response.png)
+
+<img src="./assets/error-message-response.png" alt="error-message-response" width="600"/>
 
 ## Related documents
 - [Adaptive Card Universal Action](https://docs.microsoft.com/microsoftteams/platform/task-modules-and-cards/cards/universal-actions-for-adaptive-cards/overview)
