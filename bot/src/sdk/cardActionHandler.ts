@@ -6,7 +6,7 @@ import { IAdaptiveCard } from "adaptivecards";
  */
 export enum AdaptiveCardResponse {
     /**
-     * The response card will be replaced the current one for the interactor.
+     * The response card will be replaced the current one for the interactor who trigger the action.
      */
      ReplaceForInteractor,
 
@@ -31,7 +31,9 @@ export interface TeamsFxAdaptiveCardActionHandler {
     triggerVerb: string;
 
     /**
-     * Indicate the behavior for how the card response will be sent in Teams conversation.
+     * Specify the behavior for how the card response will be sent in Teams conversation.
+     * The default value is `AdaptiveCardResponse.ReplaceForInteractor`, which means the card
+     * response will replace the current one only for the interactor.
      */
     adaptiveCardResponse?: AdaptiveCardResponse,
     

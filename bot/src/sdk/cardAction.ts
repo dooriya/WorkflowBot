@@ -4,7 +4,7 @@ import { CardActionMiddleware } from "./cardActionMiddleware";
 import { CardActionOptions } from "./interface";
 
 /**
- * A card action bot for processing card actions in adaptive card.
+ * A card action bot to respond to adaptive card universal actions.
  */
 export class CardActionBot {
     private readonly adapter: BotFrameworkAdapter;
@@ -23,7 +23,7 @@ export class CardActionBot {
 
     /**
      * Registers a card action handler to the bot.
-     * @param actionHandler A card action handlers to be registered.
+     * @param actionHandler A card action handler to be registered.
      */
     registerHandler(actionHandler: TeamsFxAdaptiveCardActionHandler) {
         if (actionHandler) {
