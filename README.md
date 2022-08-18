@@ -90,7 +90,7 @@ export class Handler1 implements TeamsFxAdaptiveCardActionHandler {
 } 
 ```
 
-> Note: you can follow [this section](#customize-action-handler) to customize the card action handler according to your business need. 
+> Note: you can follow [this section](#customize-card-action-handler) to customize the card action handler according to your business need. 
 
 #### Step 4: register the action handler
 
@@ -257,7 +257,7 @@ export const commandBot = new ConversationBot({
 }); 
 ```
 
-## Customize Action Handler
+## Customize Card Action Handler
 To handler card actions with TeamsFx SDK, each card action handler should implement `TeamsFxAdaptiveCardActionHandler` interface. Below is the interface definition for `TeamsFxAdaptiveCardActionHandler`:
 
 ```typescript
@@ -285,9 +285,14 @@ export interface TeamsFxAdaptiveCardActionHandler {
 
 ### Customize adaptive card response
 You can use the `adaptiveCardResponse` property in handler to customize how the bot send the adaptive card to users. There're 3 options to customize:
-- `AdaptiveCardResponse.ReplaceForInteractor`: this is the default behavior. The response card will be replaced the current one (the card where the button is defined) for the interactor who trigger the action.
-- `AdaptiveCardResponse.ReplaceForAll`: The response card will be replaced the action card, andd all users in the chat can view this response card.
+- `AdaptiveCardResponse.ReplaceForInteractor`: this is the default behavior. The response card will be replaced the current one (the card where the button is defined) for the interactor who trigger the action. And user users in the conversation still view the original action card.
+![image](./assets/replace-for-interactor.gif)
+
+- `AdaptiveCardResponse.ReplaceForAll`: The response card will be replaced the action card, and all users in the chat can view this response card.
+![image](./assets/replace-for-all.gif)
+
 - `AdaptiveCardResponse.NewForAll`: The response card will be sent as a separate message in the conversation that won't replace the action card. And all users in the chat view this card response.
+![image](./assets/new-for-all.gif)
 
 ### Response with text message
 Instead of using adaptive card for card action response, you can simply respond with a text message using `CardPromptMessage`. Below is sample code for using `CardPromptMessage` for a text message.
