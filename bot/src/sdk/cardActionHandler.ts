@@ -22,6 +22,22 @@ export enum AdaptiveCardResponse {
 }
 
 /**
+ * A prompt message displayed under the adaptive card. 
+*/
+export interface CardPromptMessage {
+    text: string;
+    type: CardPromptMessageType;
+}
+
+/**
+ * The type of the card prompt message. 
+*/
+export enum CardPromptMessageType {
+    Info,
+    Error
+}
+
+/**
  * Interface for adaptive card action handler that can process card action invoke and return a response.
  */
 export interface TeamsFxAdaptiveCardActionHandler {
@@ -42,5 +58,5 @@ export interface TeamsFxAdaptiveCardActionHandler {
      * @param context The turn context.
      * @param actionData The contextual data that associated with the action.
      */
-    handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | void>;
+    handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | CardPromptMessage | void>;
 }
