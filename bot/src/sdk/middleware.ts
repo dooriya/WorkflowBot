@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { ActionTypes, Activity, ActivityTypes, CardFactory, InvokeResponse, MessageFactory, Middleware, StatusCodes, TurnContext } from "botbuilder";
-import { CommandMessage, TeamsFxAdaptiveCardActionHandler, AdaptiveCardResponse, TeamsFxBotCommandHandler, TriggerPatterns, CardPromptMessage, CardPromptStyle } from "./interface";
+import { CommandMessage, TeamsFxAdaptiveCardActionHandler, AdaptiveCardResponse, TeamsFxBotCommandHandler, TriggerPatterns, CardPromptMessage, CardPromptMessageType } from "./interface";
 import { ConversationReferenceStore } from "./storage";
 import { cloneConversation } from "./utils";
 import { IAdaptiveCard } from "adaptivecards";
@@ -192,7 +192,7 @@ export class CardActionMiddleware implements Middleware {
   public readonly actionHandlers: TeamsFxAdaptiveCardActionHandler[] = [];
   private readonly defaultCardMessage: CardPromptMessage = {
     text: "Your response was sent to the app",
-    style: CardPromptStyle.Info
+    type: CardPromptMessageType.Info
   };
 
   constructor(handlers?: TeamsFxAdaptiveCardActionHandler[]) {
@@ -246,7 +246,7 @@ export class CardActionMiddleware implements Middleware {
   }
 
   private instanceOfCardPromptMessage(card: any): card is CardPromptMessage {
-    return "text" in card && "style" in card;
+    return "text" in card && "type" in card;
   }
 
   private async sendInvokeResponse(context: TurnContext, card: IAdaptiveCard | CardPromptMessage): Promise<void> {
@@ -260,8 +260,8 @@ export class CardActionMiddleware implements Middleware {
   private createInvokeResponse(card: IAdaptiveCard | CardPromptMessage): InvokeResponse<any> {
     // refer to: https://docs.microsoft.com/en-us/adaptive-cards/authoring-cards/universal-action-model#response-format
     if (this.instanceOfCardPromptMessage(card)) {
-      switch (card.style) {
-        case CardPromptStyle.Error:
+      switch (card.type) {
+        case CardPromptMessageType.Error:
           return {
             status: StatusCodes.OK,
             body: {
@@ -273,7 +273,7 @@ export class CardActionMiddleware implements Middleware {
               }
             }
           };
-        case CardPromptStyle.Info:
+        case CardPromptMessageType.Info:
         default:
           return {
             status: StatusCodes.OK,

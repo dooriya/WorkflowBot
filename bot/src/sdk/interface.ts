@@ -181,13 +181,13 @@ export interface TeamsFxAdaptiveCardActionHandler {
 */
 export interface CardPromptMessage {
   text: string;
-  style: CardPromptStyle;
+  type: CardPromptMessageType;
 }
 
 /**
- * The style of the card prompt message. 
+ * The type of the card prompt message. 
 */
-export enum CardPromptStyle {
+export enum CardPromptMessageType {
   Info,
   Error
 }
