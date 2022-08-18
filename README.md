@@ -8,15 +8,15 @@ When user gets an Adaptive Card, it can provide one or more buttons in the card 
  To simplify the development, the TeamsFx SDK provides an adaptive card action handler (`TeamsFxAdaptiveCardActionHandler`) to let developers only focus on the development of business logic to respond to the card action without learning the Bot Framework SDK.
  
 ### How it works?
-The following diagram illustrated how to respond to a adaptive card action:
+The following diagram illustrated how to respond to a adaptive card action with TeamsFx SDK:
 ![image](./assets/card-action.png)
 
 * `Action Card`: the card where you define your action that users can invoke (click button).
-* `Response Card`: A card to respond to the action when user invoke it from the action card.
+* `Response Card`: the card to respond to the action when user invoke it from the action card.
 * `Card Action Handler`: triggered when user invoke the corresponding card action (its `triggerVerb` is same as the `verb` property in adaptive card action). And it will send a response card to respond to the action.
 
 ### Steps to add card action
-You can use the following 3 steps to add more card action:
+You can use the following 4 steps to add more card action:
 
 1. [Step 1: add an action to your Adaptive Card](#step-1-add-an-action-to-your-adaptive-card)
 2. [Step 2: add adaptive card for action response](#step-2-add-adaptive-card-for-action-response)
@@ -118,7 +118,7 @@ The following diagram illustrated how to provide user-specific view with `refres
 ![image](./assets/user-speecific-view.png)
 
 * `Base card`: The bot sends the message with the base version of the card. This base card can be sent as a bot notification, or command response, or any card action response. All members of the conversation can view the same. The base card will be automatically refreshed to the users defined in `userIds` in the `refresh` property of the base card. 
-* `Refresh behavior`: Teams clients will automatically trigger a refresh when a user views the message and the last refresh response is older than a minute. The user-specific view handler will be invoked to return a card view (`Card1`) for specific user (`UserA`). And for other users in the conversation, they still view the base card. 
+* `Refresh behavior`: Teams clients will automatically trigger a refresh when a user views the message and the last refresh response is older than a minute. The user-specific view handler will be invoked to return a card view (`Response Card`) for specific user (`UserA`). And for other users in the conversation, they still view the base card. 
 
 The following gif illustrated how user-specific views shows in Teams:
 ![user-specific-views](./assets/user-specific-views.gif)
