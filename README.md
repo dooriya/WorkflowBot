@@ -1,4 +1,4 @@
-# Hello World Workflow Bot
+# Responding to Adaptive Card Action
 
 The Adaptive Card action handler feature enables the app to respond to adaptive card actions that triggered by end users to complete a sequential workflow. 
 
@@ -90,7 +90,7 @@ export class Handler1 implements TeamsFxAdaptiveCardActionHandler {
 } 
 ```
 
-> Note: you can follow [this section](#tbd-link) to customize the card action handler according to your business need. 
+> Note: you can follow [this section](#customize-action-handler) to customize the card action handler according to your business need. 
 
 #### Step 4: register the action handler
 
@@ -256,6 +256,68 @@ export const commandBot = new ConversationBot({
   } 
 }); 
 ```
+
+## Customize Action Handler
+To handler card actions with TeamsFx SDK, each card action handler should implement `TeamsFxAdaptiveCardActionHandler` interface. Below is the interface definition for `TeamsFxAdaptiveCardActionHandler`:
+
+```typescript
+export interface TeamsFxAdaptiveCardActionHandler {
+    /**
+     * The verb defined in adaptive card action that can trigger this handler.
+     */
+    triggerVerb: string;
+
+    /**
+     * Specify the behavior for how the card response will be sent in Teams conversation.
+     * The default value is `AdaptiveCardResponse.ReplaceForInteractor`, which means the card
+     * response will replace the current one only for the interactor.
+     */
+    adaptiveCardResponse?: AdaptiveCardResponse,
+    
+    /**
+     * The handler function that will be invoked when the action is fired.
+     * @param context The turn context.
+     * @param actionData The contextual data that associated with the action.
+     */
+    handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | CardPromptMessage | void>;
+}
+```
+
+### Customize adaptive card response
+You can use the `adaptiveCardResponse` property in handler to customize how the bot send the adaptive card to users. There're 3 options to customize:
+- `AdaptiveCardResponse.ReplaceForInteractor`: this is the default behavior. The response card will be replaced the current one (the card where the button is defined) for the interactor who trigger the action.
+- `AdaptiveCardResponse.ReplaceForAll`: The response card will be replaced the action card, andd all users in the chat can view this response card.
+- `AdaptiveCardResponse.NewForAll`: The response card will be sent as a separate message in the conversation that won't replace the action card. And all users in the chat view this card response.
+
+### Response with text message
+Instead of using adaptive card for card action response, you can simply respond with a text message using `CardPromptMessage`. Below is sample code for using `CardPromptMessage` for a text message.
+
+```typescript
+async handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | CardPromptMessage | void> {
+    return { 
+        text: "This is sample card action response!",
+        type: CardPromptMessageType.Info
+    }
+}
+```
+
+The response message will be rendered in Teams as below:
+![image](./assets/info-message-response.png)
+
+### Error handling
+Similar to respond with a text message, you can also use `CardPromptMessage` to return an error message if user error occurs in the action invoke. You need to specify `CardPromptMessageType.Error` for the `type` property in your `CardPromptMessage`, for example:
+
+```typescript
+async handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | CardPromptMessage | void> {
+    return { 
+        text: "Your input is invalid!",
+        type: CardPromptMessageType.Error
+    }
+}
+```
+
+The response message will be rendered in Teams as below:
+![image](./assets/error-message-response.png)
 
 ## Related documents
 - [Adaptive Card Universal Action](https://docs.microsoft.com/microsoftteams/platform/task-modules-and-cards/cards/universal-actions-for-adaptive-cards/overview)
