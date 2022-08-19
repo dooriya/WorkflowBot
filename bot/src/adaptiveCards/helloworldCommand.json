@@ -11,17 +11,20 @@
       "type": "TextBlock",
       "text": "${body}",
       "wrap": true
-    }
-  ],
-  "actions": [
+    },
     {
-      "type": "Action.Execute",
-      "verb": "acknowledged",
-      "title": "Acknowledged",
-      "data": {
-        "title": "${title}",
-        "body": "${body}"
-      }
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Execute",
+          "verb": "acknowledged",
+          "title": "Acknowledged",
+          "data": {
+            "title": "${title}",
+            "body": "${body}"
+          }
+        }
+      ]
     }
   ],
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
