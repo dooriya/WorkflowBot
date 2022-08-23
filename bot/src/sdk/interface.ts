@@ -2,8 +2,18 @@
 // Licensed under the MIT license.
 
 import { BotFrameworkAdapter } from "botbuilder";
-import { Activity, TurnContext } from "botbuilder-core";
-import { TeamsFxAdaptiveCardActionHandler } from "./cardActionHandler";
+import { Activity, InvokeResponse, TurnContext } from "botbuilder-core";
+import { IAdaptiveCard } from "adaptivecards";
+
+/**
+ * The response of a message action, e.g., `sendMessage`, `sendAdaptiveCard`.
+ */
+export interface MessageResponse {
+  /**
+   * Id of the message.
+   */
+  id?: string;
+}
 
 /**
  * The target type where the notification will be sent to.
@@ -13,7 +23,21 @@ import { TeamsFxAdaptiveCardActionHandler } from "./cardActionHandler";
  * - "Group" means to a group chat.
  * - "Person" means to a personal chat.
  */
-export type NotificationTargetType = "Channel" | "Group" | "Person";
+export enum NotificationTargetType {
+  /**
+   * The notification will be sent to a team channel.
+   * (By default, notification to a team will be sent to its "General" channel.)
+   */
+  Channel = "Channel",
+  /**
+   * The notification will be sent to a group chat.
+   */
+  Group = "Group",
+  /**
+   * The notification will be sent to a personal chat.
+   */
+  Person = "Person",
+}
 
 /**
  * Represent a notification target.
@@ -28,15 +52,19 @@ export interface NotificationTarget {
    * Send a plain text message.
    *
    * @param text - the plain text message.
+   *
+   * @returns the response of sending message.
    */
-  sendMessage(text: string): Promise<void>;
+  sendMessage(text: string): Promise<MessageResponse>;
 
   /**
    * Send an adaptive card message.
    *
    * @param card - the adaptive card raw JSON.
+   *
+   * @returns the response of sending adaptive card message.
    */
-  sendAdaptiveCard(card: unknown): Promise<void>;
+  sendAdaptiveCard(card: unknown): Promise<MessageResponse>;
 }
 
 /**
@@ -153,7 +181,72 @@ export interface CardActionOptions {
   /**
    * The action handlers to registered with the action bot. Each command should implement the interface {@link TeamsFxAdaptiveCardActionHandler} so that it can be correctly handled by this bot.
    */
-  actions: TeamsFxAdaptiveCardActionHandler[];
+  actions?: TeamsFxAdaptiveCardActionHandler[];
+}
+
+/**
+ * Options used to control how the response card will be sent to users.
+ */
+export enum AdaptiveCardResponse {
+  /**
+   * The response card will be replaced the current one for the interactor who trigger the action.
+   */
+  ReplaceForInteractor,
+
+  /**
+   * The response card will be replaced the current one for all users in the chat.
+   */
+  ReplaceForAll,
+
+  /**
+   * The response card will be sent as a new message for all users in the chat.
+   */
+  NewForAll,
+}
+
+/**
+ * Interface for adaptive card action handler that can process card action invoke and return a response.
+ */
+export interface TeamsFxAdaptiveCardActionHandler {
+  /**
+   * The verb defined in adaptive card action that can trigger this handler.
+   */
+  triggerVerb: string;
+
+  /**
+   * Specify the behavior for how the card response will be sent in Teams conversation.
+   * The default value is `AdaptiveCardResponse.ReplaceForInteractor`, which means the card
+   * response will replace the current one only for the interactor.
+   */
+  adaptiveCardResponse?: AdaptiveCardResponse;
+
+  /**
+   * The handler function that will be invoked when the action is fired.
+   * @param context The turn context.
+   * @param actionData The contextual data that associated with the action.
+   * 
+   * @returns A `Promise` representing a invoke response for the adaptive card invoke action.
+   * You can use the `InvokeResponseFactory` utility class to create an invoke response from
+   *  - A text message: 
+   *   ```typescript 
+   *   return InvokeResponseFactory.textMessage("Action is processed successfully!");
+   *   ```
+   *  - An adaptive card:
+   *    ```typescript
+   *    const responseCard = AdaptiveCards.declare(helloWorldCard).render(actionData);
+        return InvokeResponseFactory.adaptiveCard(responseCard);
+   *    ```
+   *  - An error response:
+   *     ```typescript
+   *     return InvokeResponseFactory.errorResponse(StatusCodes.BAD_REQUEST, "Invalid request");
+   *     ```
+   * 
+   * @remark For more details about the invoke response format, refer to https://docs.microsoft.com/en-us/adaptive-cards/authoring-cards/universal-action-model#response-format.
+   */
+  handleActionInvoked(
+    context: TurnContext,
+    actionData: any
+  ): Promise<InvokeResponse>;
 }
 
 /**
@@ -201,9 +294,9 @@ export interface ConversationOptions {
   /**
    * The adaptive card action handler part.
    */
-   cardAction?: CardActionOptions & {
+  cardAction?: CardActionOptions & {
     /**
-     * Whether to enable notification or not.
+     * Whether to enable adaptive card actions or not.
      */
     enabled?: boolean;
   };

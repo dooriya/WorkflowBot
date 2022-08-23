@@ -17,8 +17,8 @@
       "actions": [
         {
           "type": "Action.Execute",
-          "verb": "acknowledged",
-          "title": "Acknowledged",
+          "verb": "doStuff",
+          "title": "DoStuff",
           "data": {
             "title": "${title}",
             "body": "${body}"

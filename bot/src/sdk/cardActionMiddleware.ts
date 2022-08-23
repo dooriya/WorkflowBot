@@ -4,11 +4,10 @@ import {
     InvokeResponse,
     MessageFactory,
     Middleware,
-    StatusCodes,
     TurnContext
 } from "botbuilder";
 import { AdaptiveCardResponse, CardPromptMessage, CardPromptMessageType, TeamsFxAdaptiveCardActionHandler } from "./cardActionHandler";
-import { IAdaptiveCard } from "adaptivecards";
+import { InvokeResponseFactory } from "./invokeResponseFactory";
 
 /**
  * @internal
@@ -19,6 +18,8 @@ export class CardActionMiddleware implements Middleware {
         text: "Your response was sent to the app",
         type: CardPromptMessageType.Info
     };
+
+    private readonly defaultInvokeResponseMessage: string = "Your response was sent to the app";
 
     constructor(handlers?: TeamsFxAdaptiveCardActionHandler[]) {
         if (handlers && handlers.length > 0) {
@@ -33,34 +34,48 @@ export class CardActionMiddleware implements Middleware {
 
             for (const handler of this.actionHandlers) {
                 if (handler.triggerVerb === actionVerb) {
-                    const responseCard = await handler.handleActionInvoked(context, action.data);
-                    if (!responseCard || this.instanceOfCardPromptMessage(responseCard)) {
-                        // return card prompt message
-                        await this.sendInvokeResponse(context, responseCard || this.defaultCardMessage);
-                        return await next();
+                    let response: InvokeResponse;
+                    try {
+                        response = await handler.handleActionInvoked(context, action.data);
+                    } catch (error) {
+                        await this.sendInvokeResponse(context, InvokeResponseFactory.textMessage(this.defaultInvokeResponseMessage));                      
+                        throw error;
                     }
 
-                    if (responseCard.refresh && handler.adaptiveCardResponse !== AdaptiveCardResponse.NewForAll) {
-                        // Card won't be refreshed with AdaptiveCardResponse.ReplaceForInteractor.
-                        // So set to AdaptiveCardResponse.ReplaceForAll here.
-                        handler.adaptiveCardResponse = AdaptiveCardResponse.ReplaceForAll;
-                    }
+                    const responseType = response.body?.type;
+                    switch (responseType) {
+                        case "application/vnd.microsoft.activity.message":
+                            await this.sendInvokeResponse(context, response);
+                            break;
+                        case "application/vnd.microsoft.card.adaptive":
+                            const card = response.body?.value;
+                            if (!card) {
+                                await this.sendInvokeResponse(context, InvokeResponseFactory.textMessage(this.defaultInvokeResponseMessage));
+                                throw new Error(`Adaptive card content cannot be found in the response body`);
+                            }
 
-                    const activity = MessageFactory.attachment(CardFactory.adaptiveCard(responseCard));
-                    switch (handler.adaptiveCardResponse) {
-                        case AdaptiveCardResponse.NewForAll:
-                            // Send an invoke response to respond to the `adaptiveCard/action` invoke activity
-                            await this.sendInvokeResponse(context, this.defaultCardMessage);
-                            await context.sendActivity(activity);
+                            if (card.refresh && handler.adaptiveCardResponse !== AdaptiveCardResponse.NewForAll) {
+                                // Card won't be refreshed with AdaptiveCardResponse.ReplaceForInteractor.
+                                // So set to AdaptiveCardResponse.ReplaceForAll here.
+                                handler.adaptiveCardResponse = AdaptiveCardResponse.ReplaceForAll;
+                            }
+
+                            const activity = MessageFactory.attachment(CardFactory.adaptiveCard(card));
+                            if (handler.adaptiveCardResponse === AdaptiveCardResponse.NewForAll) {                               
+                                await this.sendInvokeResponse(context, InvokeResponseFactory.textMessage(this.defaultInvokeResponseMessage));
+                                await context.sendActivity(activity);
+                            } else if (handler.adaptiveCardResponse === AdaptiveCardResponse.ReplaceForAll) {
+                                activity.id = context.activity.replyToId;
+                                await context.updateActivity(activity);
+                                await this.sendInvokeResponse(context, response);
+                            } else {
+                                await this.sendInvokeResponse(context, response);
+                            }
                             break;
-                        case AdaptiveCardResponse.ReplaceForAll:
-                            activity.id = context.activity.replyToId;
-                            await context.updateActivity(activity);
-                            await this.sendInvokeResponse(context, responseCard);
-                            break;
-                        case AdaptiveCardResponse.ReplaceForInteractor:
+                        case "application/vnd.microsoft.error":                       
                         default:
-                            await this.sendInvokeResponse(context, responseCard);
+                            await this.sendInvokeResponse(context, response);
+                            break;
                     }
                 }
             }
@@ -69,54 +84,10 @@ export class CardActionMiddleware implements Middleware {
         await next();
     }
 
-    private async sendInvokeResponse(context: TurnContext, card: IAdaptiveCard | CardPromptMessage): Promise<void> {
-        const response: InvokeResponse = this.createInvokeResponse(card);
+    private async sendInvokeResponse(context: TurnContext, response: InvokeResponse) {
         await context.sendActivity({
             type: ActivityTypes.InvokeResponse,
             value: response
         });
-    }
-
-    private createInvokeResponse(card: IAdaptiveCard | CardPromptMessage): InvokeResponse<any> {
-        // refer to: https://docs.microsoft.com/en-us/adaptive-cards/authoring-cards/universal-action-model#response-format
-        if (this.instanceOfCardPromptMessage(card)) {
-            switch (card.type) {
-                case CardPromptMessageType.Error:
-                    return {
-                        status: StatusCodes.OK,
-                        body: {
-                            statusCode: StatusCodes.BAD_REQUEST,
-                            type: 'application/vnd.microsoft.error',
-                            value: {
-                                code: "BadRequest",
-                                message: card.text
-                            }
-                        }
-                    };
-                case CardPromptMessageType.Info:
-                default:
-                    return {
-                        status: StatusCodes.OK,
-                        body: {
-                            statusCode: StatusCodes.OK,
-                            type: 'application/vnd.microsoft.activity.message',
-                            value: card.text
-                        }
-                    };
-            }
-        } else {
-            return {
-                status: StatusCodes.OK,
-                body: {
-                    statusCode: StatusCodes.OK,
-                    type: 'application/vnd.microsoft.card.adaptive',
-                    value: card
-                }
-            };
-        }
-    }
-
-    private instanceOfCardPromptMessage(card: any): card is CardPromptMessage {
-        return "text" in card && "type" in card;
     }
 }
