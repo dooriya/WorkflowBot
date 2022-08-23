@@ -84,8 +84,9 @@ import responseCard from "../adaptiveCards/responseCard.json";
 export class Handler1 implements TeamsFxAdaptiveCardActionHandler { 
     triggerVerb = "doStuff";
 
-    async handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | void> { 
-        return AdaptiveCards.declare(responseCard).render(actionData); 
+    async handleActionInvoked(context: TurnContext, actionData: any): Promise<InvokeResponse> { 
+        const responseCardJson = AdaptiveCards.declare(responseCard).render(actionData);
+        return InvokeResponseFactory.adaptiveCard(responseCardJson);
     } 
 } 
 ```
@@ -225,7 +226,7 @@ import responseCard from "../adaptiveCards/responseCard.json";
 export class Handler1 implements TeamsFxBotCardActionHandler { 
     triggerVerb: string = "userViewRefresh";
  
-    async handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | void> {
+    async handleActionInvoked(context: TurnContext, actionData: any): Promise<InvokeResponse> {
       /**
        * If you have multiple userIds defined in your refresh action, for example: userIds: [ "<UserA>", "<userB>" ] ,
        * and you can return different card response for those users respectively with the following code sample.
@@ -233,12 +234,15 @@ export class Handler1 implements TeamsFxBotCardActionHandler {
         const currentUserId = context.activity.from.id;
         switch (currentUserId) {
           case "<userA's id>":
-            return AdaptiveCards.declare(card1).render(actionData);
+            const card1 = AdaptiveCards.declare(card1).render(actionData);
+            return InvokeResponseFactory.adaptiveCard(card1);
           case "<userB's id>":
-            return AdaptiveCards.declare(card2).render(actionData);
+            const card1 = AdaptiveCards.declare(card2).render(actionData);
+            return InvokeResponseFactory.adaptiveCard(card2);
         }
      */
-      return AdaptiveCards.declare(responseCard).render(actionData); 
+      const responseCardJson = AdaptiveCards.declare(responseCard).render(actionData);
+      return InvokeResponseFactory.adaptiveCard(responseCardJson);
     } 
 } 
 ```
@@ -279,7 +283,7 @@ export interface TeamsFxAdaptiveCardActionHandler {
      * @param context The turn context.
      * @param actionData The contextual data that associated with the action.
      */
-    handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | CardPromptMessage | void>;
+    handleActionInvoked(context: TurnContext, actionData: any): Promise<InvokeResponse>;
 }
 ```
 
@@ -295,14 +299,11 @@ You can use the `adaptiveCardResponse` property in handler to customize how the 
 ![image](./assets/new-for-all.gif)
 
 ### Response with text message
-Instead of using adaptive card for card action response, you can simply respond with a text message using `CardPromptMessage`. Below is sample code for using `CardPromptMessage` for a text message.
+Instead of using adaptive card for card action response, you can simply respond with a text message using ` InvokeResponseFactory.textMessage`:
 
 ```typescript
-async handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | CardPromptMessage | void> {
-    return { 
-        text: "This is sample card action response!",
-        type: CardPromptMessageType.Info
-    }
+async handleActionInvoked(context: TurnContext, actionData: any): Promise<InvokeResponse> {
+    return InvokeResponseFactory.textMessage("This is a sample card action response!");
 }
 ```
 
@@ -311,20 +312,19 @@ The response message will be rendered in Teams as below:
 <img src="./assets/info-message-response.png" alt="info-message-response" width="600"/>
 
 ### Error handling
-Similar to respond with a text message, you can also use `CardPromptMessage` to return an error message if user error occurs in the action invoke. You need to specify `CardPromptMessageType.Error` for the `type` property in your `CardPromptMessage`, for example:
+For some case you may want to return error response to the client. Then you can leverage the `InvokeResponseFactory.errorResponse` to build your invoke response, for example:
 
 ```typescript
-async handleActionInvoked(context: TurnContext, actionData: any): Promise<IAdaptiveCard | CardPromptMessage | void> {
-    return { 
-        text: "Your input is invalid!",
-        type: CardPromptMessageType.Error
-    }
+async handleActionInvoked(context: TurnContext, actionData: any): Promise<InvokeResponse> {
+    return InvokeResponseFactory.errorResponse(StatusCodes.BAD_REQUEST, "You input is invalid!");
 }
 ```
 
 The response message will be rendered in Teams as below:
 
 <img src="./assets/error-message-response.png" alt="error-message-response" width="600"/>
+
+> **_Note:_** for more details about the invoke response format, you can refer to [this document](https://docs.microsoft.com/adaptive-cards/authoring-cards/universal-action-model#response-format).
 
 ## Related documents
 - [Adaptive Card Universal Action](https://docs.microsoft.com/microsoftteams/platform/task-modules-and-cards/cards/universal-actions-for-adaptive-cards/overview)
